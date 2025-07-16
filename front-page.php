@@ -34,68 +34,80 @@
       <?php
       $apiKey = get_option('bookeo_api_key');
       $secretKey = get_option('bookeo_secret_key');
-      
-      // Set the timezone to avoid warnings
-      date_default_timezone_set('UTC');
 
-      // Dynamically set the time frame for the next 30 days
-      $startTime = date('Y-m-d\T00:00:00\Z');
-      $endTime = date('Y-m-d\T23:59:59\Z', strtotime('+30 days'));
-
-      $url = "https://api.bookeo.com/v2/availability/slots?startTime={$startTime}&endTime={$endTime}&apiKey={$apiKey}&secretKey={$secretKey}";
-
-      $response = wp_remote_get($url);
-
-      if (is_wp_error($response)) {
-        echo '<p class="text-center text-red-500">Failed to load classes. Please try again later.</p>';
+      if (empty($apiKey) || empty($secretKey)) {
+        echo '<p class="text-center text-red-500">API keys are not configured. Please set them in Settings -> Bookeo API.</p>';
       } else {
-        $body = wp_remote_retrieve_body($response);
-        $data = json_decode($body, true);
+        // Set the timezone to avoid warnings
+        date_default_timezone_set('UTC');
+        $startTime = date('Y-m-d\TH:i:s\Z');
+        $endTime = date('Y-m-d\TH:i:s\Z', strtotime('+30 days'));
 
-        if (!empty($data['data'])) {
-          $available_classes = array_filter($data['data'], function($class) {
-            return $class['numSeatsAvailable'] > 0;
-          });
+        // 1. Fetch available slots
+        $slots_url = "https://api.bookeo.com/v2/availability/slots?startTime={$startTime}&endTime={$endTime}&apiKey={$apiKey}&secretKey={$secretKey}";
+        $slots_response = wp_remote_get($slots_url);
 
-          if (!empty($available_classes)) {
-            echo '<div class="space-y-4">';
+        // 2. Fetch product details
+        $products_url = "https://api.bookeo.com/v2/settings/products?apiKey={$apiKey}&secretKey={$secretKey}";
+        $products_response = wp_remote_get($products_url);
 
-            foreach ($available_classes as $class) {
-              $title = esc_html($class['courseSchedule']['title']);
-              $start_time_obj = new DateTime($class['startTime']);
-              $date = $start_time_obj->format('F j, Y');
-              $start_time = $start_time_obj->format('g:i A');
-              $seats = esc_html($class['numSeatsAvailable']);
-              $productId = esc_attr($class['productId']);
-              $booking_url = "https://bookeo.com/securitytrainingacademy?type={$productId}";
-              
-              // Determine category from title
-              $category = 'other'; // Default category
-              $lower_title = strtolower($title);
-              if (strpos($lower_title, 'guard') !== false || strpos($lower_title, 'security officer') !== false) {
-                $category = 'guard';
-              } elseif (strpos($lower_title, 'firearm') !== false || strpos($lower_title, 'handgun') !== false || strpos($lower_title, 'wear & carry') !== false || strpos($lower_title, 'hql') !== false || strpos($lower_title, 'ccw') !== false) {
-                $category = 'firearms';
-              } elseif (strpos($lower_title, 'spo') !== false || strpos($lower_title, 'special police') !== false) {
-                $category = 'spo';
-              }
-              ?>
-              <div class="bg-white p-6 rounded-lg shadow-lg flex justify-between items-center class-item" data-category="<?php echo $category; ?>">
-                <div>
-                  <h3 class="text-xl font-bold text-navy"><?php echo $title; ?></h3>
-                  <p class="text-steel-gray">Date: <?php echo $date; ?> | Start Time: <?php echo $start_time; ?> | Seats Available: <?php echo $seats; ?></p>
-                </div>
-                <a href="<?php echo $booking_url; ?>" target="_blank" class="bg-safety-orange text-white font-bold py-2 px-6 rounded hover:bg-opacity-90 transition-colors whitespace-nowrap">Book Now</a>
-              </div>
-              <?php
-            }
-
-            echo '</div>';
-          } else {
-            echo '<p class="text-center">No upcoming classes with available seats at this time.</p>';
-          }
+        if (is_wp_error($slots_response) || is_wp_error($products_response)) {
+          echo '<p class="text-center text-red-500">Failed to load class data. Please try again later.</p>';
         } else {
-          echo '<p class="text-center">No upcoming classes available at this time.</p>';
+          $slots_data = json_decode(wp_remote_retrieve_body($slots_response), true);
+          $products_data = json_decode(wp_remote_retrieve_body($products_response), true);
+
+          // Create a lookup map for product details
+          $products_map = [];
+          if (!empty($products_data['data'])) {
+            foreach ($products_data['data'] as $product) {
+              $products_map[$product['productId']] = [
+                'description' => $product['description'],
+                'thumbnail' => !empty($product['images'][0]['url']) ? $product['images'][0]['url'] : ''
+              ];
+            }
+          }
+
+          if (!empty($slots_data['data'])) {
+            $available_classes = array_filter($slots_data['data'], function($class) {
+              return $class['numSeatsAvailable'] > 0;
+            });
+
+            if (!empty($available_classes)) {
+              echo '<div id="class-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">';
+
+              foreach ($available_classes as $class) {
+                $productId = $class['productId'];
+                $product_details = isset($products_map[$productId]) ? $products_map[$productId] : ['description' => '', 'thumbnail' => ''];
+                
+                $start_time_obj = new DateTime($class['startTime']);
+                $lower_title = strtolower($class['courseSchedule']['title']);
+                $category = 'other';
+                if (strpos($lower_title, 'guard') !== false || strpos($lower_title, 'security officer') !== false) $category = 'guard';
+                elseif (strpos($lower_title, 'firearm') !== false || strpos($lower_title, 'handgun') !== false || strpos($lower_title, 'wear & carry') !== false || strpos($lower_title, 'hql') !== false) $category = 'firearms';
+                elseif (strpos($lower_title, 'spo') !== false || strpos($lower_title, 'special police') !== false) $category = 'spo';
+
+                $class_data_arg = [
+                  'title' => $class['courseSchedule']['title'],
+                  'description' => $product_details['description'],
+                  'thumbnail' => $product_details['thumbnail'],
+                  'date' => $start_time_obj->format('F j, Y'),
+                  'start_time' => $start_time_obj->format('g:i A'),
+                  'seats' => $class['numSeatsAvailable'],
+                  'booking_url' => "https://bookeo.com/securitytrainingacademy?type={$productId}",
+                  'category' => $category
+                ];
+
+                get_template_part('template-parts/class-card', null, ['class_data' => $class_data_arg]);
+              }
+
+              echo '</div>';
+            } else {
+              echo '<p class="text-center">No upcoming classes with available seats at this time.</p>';
+            }
+          } else {
+            echo '<p class="text-center">No upcoming classes available at this time.</p>';
+          }
         }
       }
       ?>
