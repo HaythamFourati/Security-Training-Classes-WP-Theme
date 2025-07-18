@@ -27,9 +27,10 @@
       <h2 class="text-4xl font-bold text-navy mb-6 text-center">Upcoming Classes & Registration</h2>
       <div class="flex justify-center space-x-2 mb-12" id="class-filters">
         <button class="px-6 py-2 rounded font-semibold bg-navy text-white" data-filter="all">All</button>
-        <button class="px-6 py-2 rounded font-semibold bg-white text-navy border border-gray-300" data-filter="guard">Guard</button>
-        <button class="px-6 py-2 rounded font-semibold bg-white text-navy border border-gray-300" data-filter="firearms">Firearms</button>
-        <button class="px-6 py-2 rounded font-semibold bg-white text-navy border border-gray-300" data-filter="spo">SPO</button>
+        <button class="px-6 py-2 rounded font-semibold bg-white text-navy border border-gray-300" data-filter="guard">Security Guard Training
+        </button>
+        <button class="px-6 py-2 rounded font-semibold bg-white text-navy border border-gray-300" data-filter="firearms">Firearms Certification</button>
+        <button class="px-6 py-2 rounded font-semibold bg-white text-navy border border-gray-300" data-filter="spo">Special Police Officer (SPO) Training</button>
       </div>
       <?php
       $apiKey = get_option('bookeo_api_key');
@@ -38,6 +39,8 @@
       if (empty($apiKey) || empty($secretKey)) {
         echo '<p class="text-center text-red-500">API keys are not configured. Please set them in Settings -> Bookeo API.</p>';
       } else {
+        global $class_modals_html;
+        $class_modals_html = '';
         // Set the timezone to avoid warnings
         date_default_timezone_set('UTC');
         $startTime = date('Y-m-d\TH:i:s\Z');
@@ -88,6 +91,7 @@
                 elseif (strpos($lower_title, 'spo') !== false || strpos($lower_title, 'special police') !== false) $category = 'spo';
 
                 $class_data_arg = [
+                  'eventId' => $class['eventId'],
                   'title' => $class['courseSchedule']['title'],
                   'description' => $product_details['description'],
                   'thumbnail' => $product_details['thumbnail'],
@@ -102,6 +106,10 @@
               }
 
               echo '</div>';
+
+              // Pagination container
+              echo '<div id="class-pagination" class="flex justify-center items-center space-x-4 mt-12"></div>';
+
             } else {
               echo '<p class="text-center">No upcoming classes with available seats at this time.</p>';
             }
@@ -111,6 +119,16 @@
         }
       }
       ?>
+      
+      <!-- Modals will be rendered here -->
+      <div id="modal-container">
+        <?php 
+          global $class_modals_html;
+          if (!empty($class_modals_html)) {
+            echo $class_modals_html;
+          }
+        ?>
+      </div>
     </div>
   </section>
 
