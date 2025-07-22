@@ -11,12 +11,37 @@ if (document.querySelector("#render-react-example-here")) {
 
 // Mobile Menu Toggle
 document.addEventListener('DOMContentLoaded', function () {
+    // Floating header behavior
+    const header = document.getElementById('main-header');
+    
+    if (header) {
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    }
+    
     const mobileMenuButton = document.getElementById('mobile-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
 
     if (mobileMenuButton && mobileMenu) {
         mobileMenuButton.addEventListener('click', function () {
             mobileMenu.classList.toggle('hidden');
+        });
+    }
+
+    // Mobile Classes Sub-menu Toggle
+    const mobileClassesToggle = document.getElementById('mobile-classes-toggle');
+    const mobileClassesSubmenu = document.getElementById('mobile-classes-submenu');
+
+    if (mobileClassesToggle && mobileClassesSubmenu) {
+        mobileClassesToggle.addEventListener('click', function() {
+            mobileClassesSubmenu.classList.toggle('hidden');
+            const icon = mobileClassesToggle.querySelector('svg');
+            icon.classList.toggle('rotate-180');
         });
     }
 
@@ -94,22 +119,56 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
+        // FAQ Accordion
+        const accordion = document.getElementById('faq-accordion');
+        if (accordion) {
+            accordion.addEventListener('click', function (event) {
+                const button = event.target.closest('button');
+                if (!button) return;
+
+                const content = button.nextElementSibling;
+                const icon = button.querySelector('svg');
+
+                // Toggle the content visibility
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                    content.classList.add('hidden');
+                    content.classList.remove('p-6', 'pt-0');
+                } else {
+                    content.classList.remove('hidden');
+                    content.classList.add('p-6', 'pt-0');
+                    content.style.maxHeight = content.scrollHeight + "px";
+                }
+
+                // Rotate the icon
+                icon.classList.toggle('rotate-180');
+            });
+        }
+
         // Modal handling with event delegation
         document.body.addEventListener('click', function(e) {
             const openButton = e.target.closest('[data-modal-target]');
             if (openButton) {
                 const modal = document.querySelector(openButton.dataset.modalTarget);
-                if (modal) modal.classList.replace('hidden', 'flex');
+                if (modal) {
+                    modal.classList.replace('hidden', 'flex');
+                    document.body.classList.add('overflow-hidden');
+                }
             }
 
             const closeButton = e.target.closest('[data-modal-close]');
             if (closeButton) {
                 const modal = document.querySelector(closeButton.dataset.modalClose);
-                if (modal) modal.classList.replace('flex', 'hidden');
+                if (modal) {
+                    modal.classList.replace('flex', 'hidden');
+                    document.body.classList.remove('overflow-hidden');
+                }
             }
 
+            // Also close modal if clicking on the overlay
             if (e.target.classList.contains('class-modal')) {
                 e.target.classList.replace('flex', 'hidden');
+                document.body.classList.remove('overflow-hidden');
             }
         });
 

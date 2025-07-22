@@ -26,7 +26,7 @@ add_action('after_setup_theme', 'boilerplate_add_support');
 // Define global variables
 function theme_globals() {
     global $phone_number;
-    $phone_number = '443-702-7891';
+    $phone_number = '(443) 702-7891';
 }
 add_action('after_setup_theme', 'theme_globals');
 

@@ -27,36 +27,8 @@ if (empty($thumbnail_url)) {
     $thumbnail_url = get_theme_file_uri('/images/default-class-image.jpg');
 }
 
-// Capture modal HTML into a global variable to be printed later
-ob_start();
-?>
-<div id="<?php echo $modal_id; ?>" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden items-center justify-center p-4 class-modal">
-    <div class="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
-        <!-- Modal Header -->
-        <div class="flex justify-between items-center p-4 bg-navy text-white border-b border-gray-300">
-            <h2 class="text-xl font-bold"><?php echo $title; ?></h2>
-            <button data-modal-close="#<?php echo $modal_id; ?>" class="text-2xl font-bold leading-none hover:opacity-75">&times;</button>
-        </div>
-        
-        <!-- Modal Body -->
-        <div class="p-6 overflow-y-auto">
-            <div class="prose max-w-none">
-                <?php echo $full_description; ?>
-            </div>
-        </div>
-
-        <!-- Modal Footer -->
-        <div class="flex justify-end items-center p-4 bg-gray-50 border-t border-gray-200 mt-auto">
-            <button data-modal-close="#<?php echo $modal_id; ?>" class="text-navy font-semibold px-6 py-2 mr-4 hover:underline">Close</button>
-            <a href="<?php echo $booking_url; ?>" target="_blank" class="bg-safety-orange text-white font-bold py-2 px-6 rounded hover:bg-opacity-90 transition-colors">Book Now</a>
-        </div>
-    </div>
-</div>
-<?php
-global $class_modals_html;
-$class_modals_html .= ob_get_clean();
-
-// Now, output the card itself
+// The modal is now in its own template part (template-parts/class-modal.php).
+// The card itself is output below.
 ?>
 <div class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col class-item" data-category="<?php echo $category; ?>">
     <a href="<?php echo $booking_url; ?>" target="_blank">
