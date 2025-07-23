@@ -2,57 +2,36 @@
 
 <main>
   <!-- Hero Section -->
-  <section class="bg-gradient-to-l from-[var(--color-navy)] to-blue-800 text-white py-20 -mt-32 pt-56">
-    <div class="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
-      <!-- Text Content -->
-      <div class="text-left">
-        <h1 class="text-5xl md:text-6xl font-bold leading-tight mb-4">Maryland’s Premier Security Training Academy</h1>
-        <p class="text-lg md:text-xl text-gray-300 mb-8">State-Certified | Experienced Instructors | Flexible Scheduling</p>
-        <div class="flex flex-wrap gap-4">
-          <a href="#upcoming-classes" class="bg-safety-orange text-white font-bold py-3 px-8 rounded hover:bg-opacity-90 transition-colors text-lg">Explore Classes</a>
-          <a href="https://bookeo.com/securitytrainingacademy" target="_blank" class="bg-transparent border-2 border-white text-white font-bold py-3 px-8 rounded hover:bg-white hover:text-navy transition-colors text-lg">Book Now</a>
-        </div>
-      </div>
-      <!-- Image Collage -->
-      <div class="grid grid-cols-3 grid-rows-3 gap-3 h-96">
-        <!-- Main large image - spans 2x2 -->
-        <div class="col-span-2 row-span-2 rounded-lg overflow-hidden shadow-xl">
-          <img src="https://www.securitytrainingclasses.com/wp-content/uploads/2022/02/police-officers.jpg" alt="Professional security guard" class="w-full h-full object-cover">
-        </div>
-        
-        <!-- Top right image -->
-        <div class="rounded-lg overflow-hidden shadow-lg">
-          <img src="https://www.securitytrainingclasses.com/wp-content/uploads/2024/12/AdobeStock_240237675-1.jpg" alt="Security training" class="w-full h-full object-cover">
-        </div>
-        
-        <!-- Middle right image -->
-        <div class="rounded-lg overflow-hidden shadow-lg">
-          <img src="https://www.securitytrainingclasses.com/wp-content/uploads/2023/05/AdobeStock_386473842.jpg" alt="Security equipment" class="w-full h-full object-cover">
-        </div>
-        
-        <!-- Bottom left image -->
-        <div class="rounded-lg overflow-hidden shadow-lg">
-          <img src="https://www.securitytrainingclasses.com/wp-content/uploads/2022/10/UTAH-CONCEALED-CARRY-CLASSES-1-1.jpg" alt="Training classroom" class="w-full h-full object-cover">
-        </div>
-        
-        <!-- Bottom right image -->
-        <div class="rounded-lg overflow-hidden shadow-lg">
-          <img src="https://www.securitytrainingclasses.com/wp-content/uploads/2022/12/AdobeStock_318705595-scaled.jpeg" alt="Security badge" class="w-full h-full object-cover">
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Upcoming Classes Section -->
-  <section id="upcoming-classes" class="py-20 bg-gray-50">
+  <section class="bg-gradient-to-b from-neutral-800 via-neutral-500 to-neutral-200 text-white py-20 -mt-32 pt-48">
     <div class="container mx-auto px-4">
-      <h2 class="text-4xl font-bold text-navy mb-6 text-center">Upcoming Classes & Registration</h2>
-      <div class="flex justify-center space-x-2 mb-12" id="class-filters">
-        <button class="px-6 py-2 rounded font-semibold bg-navy text-white" data-filter="all">All</button>
-        <button class="px-6 py-2 rounded font-semibold bg-white text-navy border border-gray-300" data-filter="guard">Security Guard Training
-        </button>
-        <button class="px-6 py-2 rounded font-semibold bg-white text-navy border border-gray-300" data-filter="firearms">Firearms Certification</button>
-        <button class="px-6 py-2 rounded font-semibold bg-white text-navy border border-gray-300" data-filter="spo">Special Police Officer (SPO) Training</button>
+      <!-- Text Content -->
+      <div class="text-center">
+        <h1 class="text-7xl md:text-7xl sm:text-4xl leading-tight mb-4 text-orange-100 font-instrument-serif">Maryland’s Premier Security Training Academy </h1>
+        <div class="flex flex-col md:flex-row justify-center items-center gap-x-8 gap-y-4 text-lg text-white">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-certificate text-orange-100 text-xl"></i>
+            <span>State-Certified</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="fas fa-user-tie text-orange-100 text-xl"></i>
+            <span>Experienced Instructors</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="fas fa-calendar-alt text-orange-100 text-xl"></i>
+            <span>Flexible Scheduling</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming Classes Section -->
+      <div id="upcoming-classes" class="text-navy p-8 md:p-12 mt-4">
+      <h2 class="text-4xl text-white mb-6 text-center font-instrument-serif">Our Upcoming Classes</h2>
+      <p class="text-center text-xl text-orange-200 mb-6">Please select a category from the filters below to view our upcoming classes.</p>
+      <div class="flex justify-center flex-wrap gap-2 mb-12" id="class-filters">
+        <button class="px-6 py-2 rounded font-semibold bg-navy text-white cursor-pointer" data-filter="all">All</button>
+        <button class="px-6 py-2 rounded font-semibold bg-white text-navy border border-gray-300 cursor-pointer" data-filter="guard">Security Guard Training</button>
+        <button class="px-6 py-2 rounded font-semibold bg-white text-navy border border-gray-300 cursor-pointer" data-filter="firearms">Firearms Certification</button>
+        <button class="px-6 py-2 rounded font-semibold bg-white text-navy border border-gray-300 cursor-pointer" data-filter="spo">Special Police Officer (SPO) Training</button>
       </div>
       <?php
       $apiKey = get_option('bookeo_api_key');
@@ -156,6 +135,36 @@
         }
       }
       ?>
+      </div>
+    </div>
+  </section>
+
+  <!-- Image Collage Section -->
+  <section class="py-20 bg-white">
+    <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-navy mb-12 text-center">A Glimpse Into Our Training</h2>
+        <div class="grid grid-cols-3 grid-rows-3 gap-3 h-96 max-w-4xl mx-auto">
+            <!-- Main large image - spans 2x2 -->
+            <div class="col-span-2 row-span-2 rounded-lg overflow-hidden shadow-xl">
+                <img src="https://www.securitytrainingclasses.com/wp-content/uploads/2022/02/police-officers.jpg" alt="Professional security guard" class="w-full h-full object-cover">
+            </div>
+            <!-- Top right image -->
+            <div class="rounded-lg overflow-hidden shadow-lg">
+                <img src="https://www.securitytrainingclasses.com/wp-content/uploads/2024/12/AdobeStock_240237675-1.jpg" alt="Security training" class="w-full h-full object-cover">
+            </div>
+            <!-- Middle right image -->
+            <div class="rounded-lg overflow-hidden shadow-lg">
+                <img src="https://www.securitytrainingclasses.com/wp-content/uploads/2023/08/instructorimage22.jpg" alt="Security equipment" class="w-full h-full object-cover">
+            </div>
+            <!-- Bottom left image -->
+            <div class="rounded-lg overflow-hidden shadow-lg">
+                <img src="https://www.securitytrainingclasses.com/wp-content/uploads/2022/12/AdobeStock_169813314-1.jpg" alt="Training classroom" class="w-full h-full object-cover">
+            </div>
+            <!-- Bottom right image -->
+            <div class="rounded-lg overflow-hidden shadow-lg">
+                <img src="https://www.securitytrainingclasses.com/wp-content/uploads/2022/12/AdobeStock_318705595-scaled.jpeg" alt="Security badge" class="w-full h-full object-cover">
+            </div>
+        </div>
     </div>
   </section>
 
@@ -182,7 +191,7 @@
             <p class="font-semibold">Approved</p>
           </div>
           <div>
-            <p class="text-3xl font-bold text-safety-orange">Since 2005</p>
+            <p class="text-3xl font-bold text-safety-orange">Since 2018</p>
             <p class="font-semibold">Serving Maryland</p>
           </div>
         </div>
