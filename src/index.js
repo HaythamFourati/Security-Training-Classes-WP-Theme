@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const prevButton = document.createElement('button');
                 prevButton.innerText = 'Previous';
                 prevButton.disabled = currentPage === 1;
-                prevButton.className = 'px-4 py-2 rounded font-semibold text-navy border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed';
+                prevButton.className = 'px-4 py-2 rounded font-semibold text-navy border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed';
                 prevButton.onclick = () => { currentPage--; updateClasses(); };
                 paginationContainer.appendChild(prevButton);
 
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const nextButton = document.createElement('button');
                 nextButton.innerText = 'Next';
                 nextButton.disabled = currentPage === totalPages;
-                nextButton.className = 'px-4 py-2 rounded font-semibold text-navy border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed';
+                nextButton.className = 'px-4 py-2 rounded font-semibold text-navy border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed';
                 nextButton.onclick = () => { currentPage++; updateClasses(); };
                 paginationContainer.appendChild(nextButton);
             }

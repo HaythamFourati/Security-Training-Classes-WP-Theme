@@ -12,6 +12,16 @@
     --color-safety-orange: #ff6600;
     --color-deep-red: #cc0000;
   }
+
+  /* Set font-instrument-serif as default for all headings */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Instrument Serif', serif;
+  }
+  
+  /* Exception for class card titles */
+  .class-item h3 {
+    font-family: inherit;
+  }
 }
 
 @layer utilities {

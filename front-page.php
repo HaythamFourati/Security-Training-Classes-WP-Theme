@@ -2,7 +2,7 @@
 
 <main>
   <!-- Hero Section -->
-  <section class="bg-gradient-to-b from-neutral-800 via-neutral-500 to-neutral-200 text-white py-20 -mt-32 pt-48">
+  <section class="bg-gradient-to-b from-blue-800 via-blue-700 to-blue-500 text-white py-20 -mt-32 pt-48">
     <div class="container mx-auto px-4">
       <!-- Text Content -->
       <div class="text-center">
@@ -23,146 +23,105 @@
         </div>
       </div>
 
-      <!-- Upcoming Classes Section -->
-      <div id="upcoming-classes" class="text-navy p-8 md:p-12 mt-4">
-      <h2 class="text-4xl text-white mb-6 text-center font-instrument-serif">Our Upcoming Classes</h2>
-      <p class="text-center text-xl text-orange-200 mb-6">Please select a category from the filters below to view our upcoming classes.</p>
-      <div class="flex justify-center flex-wrap gap-2 mb-12" id="class-filters">
-        <button class="px-6 py-2 rounded font-semibold bg-navy text-white cursor-pointer" data-filter="all">All</button>
-        <button class="px-6 py-2 rounded font-semibold bg-white text-navy border border-gray-300 cursor-pointer" data-filter="guard">Security Guard Training</button>
-        <button class="px-6 py-2 rounded font-semibold bg-white text-navy border border-gray-300 cursor-pointer" data-filter="firearms">Firearms Certification</button>
-        <button class="px-6 py-2 rounded font-semibold bg-white text-navy border border-gray-300 cursor-pointer" data-filter="spo">Special Police Officer (SPO) Training</button>
-      </div>
-      <?php
-      $apiKey = get_option('bookeo_api_key');
-      $secretKey = get_option('bookeo_secret_key');
+      <?php get_template_part('template-parts/upcoming-classes-section'); ?>
+    </div>
+  </section>
 
-      if (empty($apiKey) || empty($secretKey)) {
-        echo '<p class="text-center text-red-500">API keys are not configured. Please set them in Settings -> Bookeo API.</p>';
-      } else {
-        // Set the timezone to avoid warnings
-        date_default_timezone_set('UTC');
-        $startTime = date('Y-m-d\TH:i:s\Z');
-        $endTime = date('Y-m-d\TH:i:s\Z', strtotime('+30 days'));
-
-        // 1. Fetch available slots
-        $slots_url = "https://api.bookeo.com/v2/availability/slots?startTime={$startTime}&endTime={$endTime}&apiKey={$apiKey}&secretKey={$secretKey}";
-        $slots_response = wp_remote_get($slots_url);
-
-        // 2. Fetch product details
-        $products_url = "https://api.bookeo.com/v2/settings/products?apiKey={$apiKey}&secretKey={$secretKey}";
-        $products_response = wp_remote_get($products_url);
-
-        if (is_wp_error($slots_response) || is_wp_error($products_response)) {
-          echo '<p class="text-center text-red-500">Failed to load class data. Please try again later.</p>';
-        } else {
-          $slots_data = json_decode(wp_remote_retrieve_body($slots_response), true);
-          $products_data = json_decode(wp_remote_retrieve_body($products_response), true);
-
-          // Create a lookup map for product details
-          $products_map = [];
-          if (!empty($products_data['data'])) {
-            foreach ($products_data['data'] as $product) {
-              $products_map[$product['productId']] = [
-                'description' => $product['description'],
-                'thumbnail' => !empty($product['images'][0]['url']) ? $product['images'][0]['url'] : ''
-              ];
-            }
-          }
-
-          if (!empty($slots_data['data'])) {
-            $available_classes = array_filter($slots_data['data'], function($class) {
-              return $class['numSeatsAvailable'] > 0;
-            });
-
-            if (!empty($available_classes)) {
-              echo '<div id="class-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">';
-
-              foreach ($available_classes as $class) {
-                $productId = $class['productId'];
-                $product_details = isset($products_map[$productId]) ? $products_map[$productId] : ['description' => '', 'thumbnail' => ''];
-                
-                $start_time_obj = new DateTime($class['startTime']);
-                $lower_title = strtolower($class['courseSchedule']['title']);
-                $category = 'other';
-                if (strpos($lower_title, 'guard') !== false || strpos($lower_title, 'security officer') !== false) $category = 'guard';
-                elseif (strpos($lower_title, 'firearm') !== false || strpos($lower_title, 'handgun') !== false || strpos($lower_title, 'wear & carry') !== false || strpos($lower_title, 'hql') !== false) $category = 'firearms';
-                elseif (strpos($lower_title, 'spo') !== false || strpos($lower_title, 'special police') !== false) $category = 'spo';
-
-                $class_data_arg = [
-                  'eventId' => $class['eventId'],
-                  'title' => $class['courseSchedule']['title'],
-                  'description' => $product_details['description'],
-                  'thumbnail' => $product_details['thumbnail'],
-                  'date' => $start_time_obj->format('F j, Y'),
-                  'start_time' => $start_time_obj->format('g:i A'),
-                  'seats' => $class['numSeatsAvailable'],
-                  'booking_url' => "https://bookeo.com/securitytrainingacademy?type={$productId}",
-                  'category' => $category
-                ];
-
-                get_template_part('template-parts/class-card', null, ['class_data' => $class_data_arg]);
-              }
-
-              echo '</div>';
-
-              // Pagination container
-              echo '<div id="class-pagination" class="flex justify-center items-center space-x-4 mt-12"></div>';
-
-            } else {
-              echo '<p class="text-center">No upcoming classes with available seats at this time.</p>';
-            }
-          } else {
-            echo '<p class="text-center">No upcoming classes available at this time.</p>';
-          }
-
-          // Render the modals outside of the main grid
-          if (!empty($available_classes)) {
-            foreach ($available_classes as $class) {
-              $productId = $class['productId'];
-              $product_details = isset($products_map[$productId]) ? $products_map[$productId] : ['description' => '', 'thumbnail' => ''];
-
-              $class_data_arg = [
-                'eventId' => $class['eventId'],
-                'title' => $class['courseSchedule']['title'],
-                'description' => $product_details['description'],
-                'booking_url' => "https://bookeo.com/securitytrainingacademy?type={$productId}",
-              ];
-
-              get_template_part('template-parts/class-modal', null, ['class_data' => $class_data_arg]);
-            }
-          }
-        }
-      }
-      ?>
+  <!-- Find Us Section -->
+  <section class="py-20 bg-white">
+    <div class="container mx-auto px-4">
+      <h2 class="text-4xl font-bold text-navy mb-8 text-center">How to Find Us</h2>
+      <div class="grid md:grid-cols-2 gap-8 items-center">
+        <div class="bg-gray-50 p-6 rounded-lg shadow-lg">
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3094.0239088652147!2d-76.52236872458171!3d39.15143783167563!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89b7ffa9978295f7%3A0xb1deb57a4af8b76f!2sSecurity%20Training%20academy!5e0!3m2!1sen!2stn!4v1753547801368!5m2!1sen!2stn" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="rounded-lg"></iframe>
+        </div>
+        <div class="text-navy">
+          <h3 class="text-3xl font-bold mb-4">Visit Our Training Facility</h3>
+          <p class="mb-6 text-lg">Located in the heart of Pasadena, Maryland, our state-of-the-art training facility is easily accessible and equipped with everything you need for your security training journey.</p>
+          
+          <div class="space-y-4">
+            <div class="flex items-start">
+              <div class="bg-navy text-white p-2 rounded-full mr-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+              </div>
+              <div>
+                <h4 class="font-bold text-lg">Address</h4>
+                <p>8567 Fort Smallwood Rd unit C,<br>Pasadena, MD 21122, United States</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start">
+              <div class="bg-navy text-white p-2 rounded-full mr-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              </div>
+              <div>
+                <h4 class="font-bold text-lg">Hours</h4>
+                <p>Monday - Friday: 9:00 AM - 5:00 PM<br>Saturday: 10:00 AM - 3:00 PM<br>Sunday: Closed</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start">
+              <div class="bg-navy text-white p-2 rounded-full mr-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+              </div>
+              <div>
+                <h4 class="font-bold text-lg">Contact</h4>
+                <p>Phone: (410) 255-0000<br>Email: info@securitytrainingclasses.com</p>
+              </div>
+            </div>
+          </div>
+          
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Image Collage Section -->
+  <!-- Training Glimpse Section -->
   <section class="py-20 bg-white">
     <div class="container mx-auto px-4">
         <h2 class="text-4xl font-bold text-navy mb-12 text-center">A Glimpse Into Our Training</h2>
-        <div class="grid grid-cols-3 grid-rows-3 gap-3 h-96 max-w-4xl mx-auto">
-            <!-- Main large image - spans 2x2 -->
-            <div class="col-span-2 row-span-2 rounded-lg overflow-hidden shadow-xl">
-                <img src="https://www.securitytrainingclasses.com/wp-content/uploads/2022/02/police-officers.jpg" alt="Professional security guard" class="w-full h-full object-cover">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+            <!-- Text Content -->
+            <div class="text-navy order-2 md:order-1">
+                <h3 class="text-3xl font-bold mb-4">Launch Your Career with Maryland's Top Security Training Academy</h3>
+                <h4 class="text-2xl text-safety-orange font-bold mb-6">Train. Certify. Get Hired.</h4>
+                
+                <p class="mb-6">At Security Training Academy, we help you turn ambition into opportunity. Our expert-led programs prepare you for high-demand roles in the security and law enforcement field. Whether you're entering the industry or expanding your credentials, we have the training and support you need to succeed.</p>
+                
+                <p class="mb-6">Our comprehensive curriculum is designed by industry veterans with decades of experience. From basic security officer training to advanced firearms certification and specialized police officer programs, we offer the full spectrum of security education.</p>
+                
+                <p class="mb-6">With small class sizes, hands-on training scenarios, and personalized attention, we ensure that every student masters the skills needed to excel in their security career.</p>
+                
+                <div class="mt-8 flex flex-wrap gap-4">
+                    <a href="#upcoming-classes" class="bg-safety-orange text-white font-bold py-3 px-6 rounded hover:bg-opacity-90 transition-colors">View Upcoming Classes</a>
+                    <a href="#contact" class="bg-navy text-white font-bold py-3 px-6 rounded hover:bg-opacity-90 transition-colors">Contact Us</a>
+                </div>
             </div>
-            <!-- Top right image -->
-            <div class="rounded-lg overflow-hidden shadow-lg">
-                <img src="https://www.securitytrainingclasses.com/wp-content/uploads/2024/12/AdobeStock_240237675-1.jpg" alt="Security training" class="w-full h-full object-cover">
-            </div>
-            <!-- Middle right image -->
-            <div class="rounded-lg overflow-hidden shadow-lg">
-                <img src="https://www.securitytrainingclasses.com/wp-content/uploads/2023/08/instructorimage22.jpg" alt="Security equipment" class="w-full h-full object-cover">
-            </div>
-            <!-- Bottom left image -->
-            <div class="rounded-lg overflow-hidden shadow-lg">
-                <img src="https://www.securitytrainingclasses.com/wp-content/uploads/2022/12/AdobeStock_169813314-1.jpg" alt="Training classroom" class="w-full h-full object-cover">
-            </div>
-            <!-- Bottom right image -->
-            <div class="rounded-lg overflow-hidden shadow-lg">
-                <img src="https://www.securitytrainingclasses.com/wp-content/uploads/2022/12/AdobeStock_318705595-scaled.jpeg" alt="Security badge" class="w-full h-full object-cover">
+            
+            <!-- Image Collage -->
+            <div class="order-1 md:order-2">
+                <div class="grid grid-cols-3 grid-rows-3 gap-3 h-[28rem] mx-auto">
+                    <!-- Main large image - spans 2x2 -->
+                    <div class="col-span-2 row-span-2 rounded-lg overflow-hidden shadow-xl">
+                        <img src="https://www.securitytrainingclasses.com/wp-content/uploads/2022/02/police-officers.jpg" alt="Professional security guard" class="w-full h-full object-cover">
+                    </div>
+                    <!-- Top right image -->
+                    <div class="rounded-lg overflow-hidden shadow-lg">
+                        <img src="https://www.securitytrainingclasses.com/wp-content/uploads/2024/12/AdobeStock_240237675-1.jpg" alt="Security training" class="w-full h-full object-cover">
+                    </div>
+                    <!-- Middle right image -->
+                    <div class="rounded-lg overflow-hidden shadow-lg">
+                        <img src="https://www.securitytrainingclasses.com/wp-content/uploads/2023/08/instructorimage22.jpg" alt="Security equipment" class="w-full h-full object-cover">
+                    </div>
+                    <!-- Bottom left image -->
+                    <div class="rounded-lg overflow-hidden shadow-lg">
+                        <img src="https://www.securitytrainingclasses.com/wp-content/uploads/2022/12/AdobeStock_169813314-1.jpg" alt="Training classroom" class="w-full h-full object-cover">
+                    </div>
+                    <!-- Bottom right image -->
+                    <div class="rounded-lg overflow-hidden shadow-lg">
+                        <img src="https://www.securitytrainingclasses.com/wp-content/uploads/2022/12/AdobeStock_318705595-scaled.jpeg" alt="Security badge" class="w-full h-full object-cover">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -225,73 +184,9 @@
   </section>
 
   
-  <!-- FAQ Accordion Section -->
-  <section class="py-20 bg-gray-100">
-    <div class="container mx-auto px-4 max-w-4xl">
-      <h2 class="text-4xl font-bold text-navy text-center mb-12">Frequently Asked Questions</h2>
-      <div class="space-y-4" id="faq-accordion">
-        <!-- FAQ Item 1 -->
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-          <button class="w-full flex justify-between items-center text-left p-6 font-bold text-navy text-xl focus:outline-none">
-            <span>Do I need any prior experience to take a firearms training course?</span>
-            <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-          </button>
-          <div class="p-6 pt-0 text-steel-gray hidden">
-            No prior experience is necessary! We offer beginner, intermediate, and advanced courses tailored to your current skill level.
-          </div>
-        </div>
-        <!-- FAQ Item 2 -->
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-          <button class="w-full flex justify-between items-center text-left p-6 font-bold text-navy text-xl focus:outline-none">
-            <span>What should I bring to a firearms training class?</span>
-            <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-          </button>
-          <div class="p-6 pt-0 text-steel-gray hidden">
-            For most classes, you'll need a valid government-issued ID, appropriate clothing (closed-toe shoes, hat, safety glasses, and hearing protection), and your firearm and ammunition (if applicable). Some courses provide firearms if needed.
-          </div>
-        </div>
-        <!-- FAQ Item 3 -->
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-          <button class="w-full flex justify-between items-center text-left p-6 font-bold text-navy text-xl focus:outline-none">
-            <span>Do I need any experience to enroll in your security guard training program?</span>
-            <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-          </button>
-          <div class="p-6 pt-0 text-steel-gray hidden">
-            No prior experience is required. Our courses are designed for beginners as well as those looking to upgrade or renew their certifications.
-          </div>
-        </div>
-        <!-- FAQ Item 4 -->
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-          <button class="w-full flex justify-between items-center text-left p-6 font-bold text-navy text-xl focus:outline-none">
-            <span>What is a Special Police Officer (SPO)?</span>
-            <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-          </button>
-          <div class="p-6 pt-0 text-steel-gray hidden">
-            A Special Police Officer is a licensed individual who has limited law enforcement authority, typically on private property, such as at government buildings, hospitals, universities, or private companies. They are authorized to carry a firearm and make arrests within their jurisdiction.
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <?php get_template_part('template-parts/faq-section'); ?>
 
-<!-- Contact Section -->
-<section class="py-20 bg-gray-50 text-navy">
-    <div class="container mx-auto text-center px-4">
-        <h2 class="text-4xl font-bold mb-4">Still have questions?</h2>
-        <p class="text-xl mb-4">Speak with an instructor today!</p>
-        <p class="text-sm mb-8">8567 Fort Smallwood Rd unit C,
-       <br/> Pasadena, MD 21122, United States</p>
-        <div class="max-w-xl mx-auto">
-            <form class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input type="text" placeholder="Name" class="p-3 rounded bg-gray-200 text-navy placeholder-navy">
-                <input type="email" placeholder="Email" class="p-3 rounded bg-gray-200 text-navy placeholder-navy">
-                <input type="tel" placeholder="Phone" class="p-3 rounded bg-gray-200 text-navy placeholder-navy">
-                <input type="text" placeholder="Message" class="p-3 rounded bg-gray-200 text-navy placeholder-navy md:col-span-2">
-                <button type="submit" class="bg-safety-orange text-white font-bold py-3 px-6 rounded hover:bg-opacity-90 md:col-span-2">Send Message</button>
-            </form>
-        </div>
-    </div>
-  </section>
+  <?php get_template_part('template-parts/contact-section'); ?>
   
 </main>
 
