@@ -24,46 +24,51 @@
       <a href="<?php echo get_home_url(); ?>" class="hover:text-safety-orange transition-colors">Home</a>
       <!-- Classes Dropdown -->
       <div class="relative group">
-        <button class="hover:text-safety-orange transition-colors flex items-center">
+        <button class="hover:text-safety-orange transition-colors flex items-center cursor-pointer">
           Classes
           <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
         </button>
         <div class="absolute left-0 pt-2 w-80 rounded-md shadow-xl bg-white hidden group-hover:block z-50 transform origin-top-left transition-all duration-150 ease-out">
-          <div class="py-2 text-navy border-t-4 border-safety-orange rounded-t-md overflow-hidden">
+          <div class="py-2 text-navy rounded-t-md overflow-hidden">
             <a href="<?php echo get_permalink(get_page_by_path('all-classes')); ?>" class="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-safety-orange transition-colors border-l-4 border-transparent hover:border-safety-orange flex items-center">
               <i class="fas fa-th-list mr-3 text-navy"></i>
               <span>ALL CLASSES</span>
             </a>
-            <a href="#" class="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-safety-orange transition-colors border-l-4 border-transparent hover:border-safety-orange flex items-center">
+            <a href="/security-guard-training" class="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-safety-orange transition-colors border-l-4 border-transparent hover:border-safety-orange flex items-center">
               <i class="fas fa-user-shield mr-3 text-navy"></i>
               <span>Security Guard Training</span>
             </a>
-            <a href="#" class="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-safety-orange transition-colors border-l-4 border-transparent hover:border-safety-orange flex items-center">
+            <a href="/firearms-certifications" class="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-safety-orange transition-colors border-l-4 border-transparent hover:border-safety-orange flex items-center">
               <i class="fas fa-bullseye mr-3 text-navy"></i>
               <span>Firearms Certifications MD & Multi State</span>
             </a>
-            <a href="#" class="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-safety-orange transition-colors border-l-4 border-transparent hover:border-safety-orange flex items-center">
+            <a href="/special-police-training" class="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-safety-orange transition-colors border-l-4 border-transparent hover:border-safety-orange flex items-center">
               <i class="fas fa-shield-alt mr-3 text-navy"></i>
               <span>Special Police Training</span>
             </a>
-            <a href="#" class="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-safety-orange transition-colors border-l-4 border-transparent hover:border-safety-orange flex items-center">
+            <a href="/nra-classes" class="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-safety-orange transition-colors border-l-4 border-transparent hover:border-safety-orange flex items-center">
               <i class="fas fa-medal mr-3 text-navy"></i>
               <span>NRA Classes</span>
             </a>
-            <a href="#" class="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-safety-orange transition-colors border-l-4 border-transparent hover:border-safety-orange flex items-center">
+            <a href="/uscca-classes" class="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-safety-orange transition-colors border-l-4 border-transparent hover:border-safety-orange flex items-center">
               <i class="fas fa-certificate mr-3 text-navy"></i>
               <span>USCCA Classes</span>
             </a>
-            <a href="#" class="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-safety-orange transition-colors border-l-4 border-transparent hover:border-safety-orange flex items-center">
+            <a href="/life-saving-courses" class="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-safety-orange transition-colors border-l-4 border-transparent hover:border-safety-orange flex items-center">
               <i class="fas fa-heartbeat mr-3 text-navy"></i>
               <span>Life Saving Courses, CPR, ACLS, PALS</span>
             </a>
           </div>
         </div>
       </div>
-      <a href="/faq" class="hover:text-safety-orange transition-colors">FAQs</a>
+      
+      <a href="#faq" class="hover:text-safety-orange transition-colors">FAQs</a>
       <a href="<?php echo get_permalink(get_option('page_for_posts')); ?>" class="hover:text-safety-orange transition-colors">Blog</a>
-      <a href="#" class="hover:text-safety-orange transition-colors">Contact Us</a>
+      <a href="#contact" class="hover:text-safety-orange transition-colors">Contact Us</a>
+      <a href="https://www.policeprotectionservicesllc.com/" target="_blank" class="hover:text-safety-orange transition-colors flex items-center">
+        Police Protection Services
+        <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+      </a>
     </nav>
 
     <!-- Right-side buttons -->
@@ -75,7 +80,7 @@
             </svg>
             <span class="text-white text-lg"><?php echo esc_html($GLOBALS['phone_number']); ?></span>
         </a>
-        <a href="#" class="bg-safety-orange text-white font-bold py-2 px-4 rounded hover:bg-opacity-90 transition-colors">
+        <a href="https://bookeo.com/securitytrainingacademy" target="_blank" class="bg-safety-orange text-white font-bold py-2 px-4 rounded hover:bg-opacity-90 transition-colors">
             Book Now
         </a>
     </div>
@@ -104,39 +109,43 @@
               <i class="fas fa-th-list mr-2 text-safety-orange"></i>
               <span>ALL CLASSES</span>
             </a>
-            <a href="#" class="hover:text-safety-orange transition-colors py-2 pl-3 flex items-center">
+            <a href="/security-guard-training" class="hover:text-safety-orange transition-colors py-2 pl-3 flex items-center">
               <i class="fas fa-user-shield mr-2 text-safety-orange"></i>
               <span>Security Guard Training</span>
             </a>
-            <a href="#" class="hover:text-safety-orange transition-colors py-2 pl-3 flex items-center">
+            <a href="/firearms-certifications" class="hover:text-safety-orange transition-colors py-2 pl-3 flex items-center">
               <i class="fas fa-bullseye mr-2 text-safety-orange"></i>
               <span>Firearms Certifications MD & Multi State</span>
             </a>
-            <a href="#" class="hover:text-safety-orange transition-colors py-2 pl-3 flex items-center">
+            <a href="/special-police-training" class="hover:text-safety-orange transition-colors py-2 pl-3 flex items-center">
               <i class="fas fa-shield-alt mr-2 text-safety-orange"></i>
               <span>Special Police Training</span>
             </a>
-            <a href="#" class="hover:text-safety-orange transition-colors py-2 pl-3 flex items-center">
+            <a href="/nra-classes" class="hover:text-safety-orange transition-colors py-2 pl-3 flex items-center">
               <i class="fas fa-medal mr-2 text-safety-orange"></i>
               <span>NRA Classes</span>
             </a>
-            <a href="#" class="hover:text-safety-orange transition-colors py-2 pl-3 flex items-center">
+            <a href="/uscca-classes" class="hover:text-safety-orange transition-colors py-2 pl-3 flex items-center">
               <i class="fas fa-certificate mr-2 text-safety-orange"></i>
               <span>USCCA Classes</span>
             </a>
-            <a href="#" class="hover:text-safety-orange transition-colors py-2 pl-3 flex items-center">
+            <a href="/life-saving-courses" class="hover:text-safety-orange transition-colors py-2 pl-3 flex items-center">
               <i class="fas fa-heartbeat mr-2 text-safety-orange"></i>
               <span>Life Saving Courses, CPR, ACLS, PALS</span>
             </a>
         </div>
       </div>
 
+      <a href="https://www.policeprotectionservicesllc.com/" target="_blank" class="hover:text-safety-orange transition-colors py-2 flex items-center">
+        Police Protection Services
+        <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+      </a>
       <a href="#" class="hover:text-safety-orange transition-colors py-2">Schedule & Registration</a>
-      <a href="/faq" class="hover:text-safety-orange transition-colors py-2">FAQs</a>
+      <a href="#faq" class="hover:text-safety-orange transition-colors py-2">FAQs</a>
       <a href="<?php echo get_permalink(get_option('page_for_posts')); ?>" class="hover:text-safety-orange transition-colors py-2">Blog</a>
-      <a href="#" class="hover:text-safety-orange transition-colors py-2">Contact Us</a>
+      <a href="#contact" class="hover:text-safety-orange transition-colors py-2">Contact Us</a>
       <div class="border-t border-steel-gray my-2"></div>
-      <a href="#" class="bg-safety-orange text-white font-bold py-2 px-4 rounded hover:bg-opacity-90 transition-colors mt-2 text-center">
+      <a href="https://bookeo.com/securitytrainingacademy" target="_blank" class="bg-safety-orange text-white font-bold py-2 px-4 rounded hover:bg-opacity-90 transition-colors mt-2 text-center">
         Book Now
       </a>
       <a href="tel:<?php echo esc_attr($GLOBALS['phone_number']); ?>" class="text-sm text-center mt-2">Call Us: <?php echo esc_html($GLOBALS['phone_number']); ?></a>

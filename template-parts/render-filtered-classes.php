@@ -10,19 +10,11 @@ $filter_term = isset($args['filter_term']) ? $args['filter_term'] : '';
 
 // Define the section ID based on the filter term
 $section_id = !empty($filter_term) ? 'filtered-classes-' . sanitize_title($filter_term) : 'filtered-classes';
-
-// Define the section title based on the filter term
-$section_title = !empty($filter_term) ? esc_html($filter_term) . ' Classes' : 'Featured Classes';
-
-// Define the section description based on the filter term
-$section_description = !empty($filter_term) ? 'Browse our ' . esc_html(strtolower($filter_term)) . ' training courses' : 'Browse our featured security training courses';
 ?>
 
 <!-- Filtered Classes Section -->
 <section id="<?php echo $section_id; ?>" class="py-20 bg-white">
   <div class="container mx-auto px-4">
-    <h2 class="text-4xl font-bold text-navy mb-6 text-center"><?php echo $section_title; ?></h2>
-    <p class="text-center text-xl text-steel-gray mb-12"><?php echo $section_description; ?></p>
     
     <?php
     $apiKey = get_option('bookeo_api_key');

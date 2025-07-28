@@ -9,9 +9,6 @@
 <!-- All Classes Section -->
 <section id="all-classes" class="py-20 bg-white">
   <div class="container mx-auto px-4">
-    <h2 class="text-4xl font-bold text-navy mb-6 text-center">All Available Classes</h2>
-    <p class="text-center text-xl text-steel-gray mb-12">Browse our complete catalog of security training courses</p>
-    
     <?php
     $apiKey = get_option('bookeo_api_key');
     $secretKey = get_option('bookeo_secret_key');

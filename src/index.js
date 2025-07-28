@@ -45,6 +45,32 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // FAQ Accordion
+    const accordion = document.getElementById('faq-accordion');
+    if (accordion) {
+        accordion.addEventListener('click', function (event) {
+            const button = event.target.closest('button');
+            if (!button) return;
+
+            const content = button.nextElementSibling;
+            const icon = button.querySelector('svg');
+
+            // Toggle the content visibility
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+                content.classList.add('hidden');
+                content.classList.remove('p-6', 'pt-0');
+            } else {
+                content.classList.remove('hidden');
+                content.classList.add('p-6', 'pt-0');
+                content.style.maxHeight = content.scrollHeight + "px";
+            }
+
+            // Rotate the icon
+            icon.classList.toggle('rotate-180');
+        });
+    }
+
     // Class Filtering, Pagination, and Modal Logic
     const filterContainer = document.getElementById('class-filters');
     const classGrid = document.getElementById('class-grid');
@@ -119,31 +145,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        // FAQ Accordion
-        const accordion = document.getElementById('faq-accordion');
-        if (accordion) {
-            accordion.addEventListener('click', function (event) {
-                const button = event.target.closest('button');
-                if (!button) return;
 
-                const content = button.nextElementSibling;
-                const icon = button.querySelector('svg');
-
-                // Toggle the content visibility
-                if (content.style.maxHeight) {
-                    content.style.maxHeight = null;
-                    content.classList.add('hidden');
-                    content.classList.remove('p-6', 'pt-0');
-                } else {
-                    content.classList.remove('hidden');
-                    content.classList.add('p-6', 'pt-0');
-                    content.style.maxHeight = content.scrollHeight + "px";
-                }
-
-                // Rotate the icon
-                icon.classList.toggle('rotate-180');
-            });
-        }
 
         // Modal handling with event delegation
         document.body.addEventListener('click', function(e) {

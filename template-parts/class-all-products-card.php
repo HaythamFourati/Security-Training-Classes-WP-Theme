@@ -19,7 +19,7 @@ $modal_id = 'product-modal-' . $productId;
 
 // Default thumbnail if none is provided
 if (empty($thumbnail_url)) {
-    $thumbnail_url = get_theme_file_uri('/images/default-class-image.jpg');
+    $thumbnail_url = 'https://www-151g.bookeo.com/bookeo/cfile/42557E9JMC918221126FA4/1749122294599_EA4WCJPPWRLX6WMK97XLA3LXAP3C4HYA_STARTYOUTUBE_JvMJrKA9mrs_ENDYOUTUBE__480_360.jpg';
 }
 ?>
 <div class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col class-item">

@@ -25,10 +25,21 @@ add_action('after_setup_theme', 'boilerplate_add_support');
 
 // Define global variables
 function theme_globals() {
-    global $phone_number;
+    global $phone_number, $email;
     $phone_number = '(443) 702-7891';
+    $email = 'info@securitytrainingclasses.com';
 }
 add_action('after_setup_theme', 'theme_globals');
+
+/**
+ * Calculate reading time for blog posts
+ */
+function reading_time() {
+    $content = get_post_field('post_content', get_the_ID());
+    $word_count = str_word_count(strip_tags($content));
+    $reading_time = ceil($word_count / 200); // Average reading speed is 200 words per minute
+    return $reading_time;
+}
 
 /**
  * Bookeo API Settings Page
