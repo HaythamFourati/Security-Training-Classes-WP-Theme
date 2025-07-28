@@ -26,10 +26,36 @@ document.addEventListener('DOMContentLoaded', function () {
     
     const mobileMenuButton = document.getElementById('mobile-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
+    const mobileMenuClose = document.getElementById('mobile-menu-close');
+    const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
 
     if (mobileMenuButton && mobileMenu) {
         mobileMenuButton.addEventListener('click', function () {
-            mobileMenu.classList.toggle('hidden');
+            mobileMenu.classList.remove('hidden');
+        });
+    }
+
+    // Close mobile menu
+    if (mobileMenuClose && mobileMenu) {
+        mobileMenuClose.addEventListener('click', function () {
+            mobileMenu.classList.add('hidden');
+        });
+    }
+
+    // Close mobile menu when clicking overlay
+    if (mobileMenuOverlay && mobileMenu) {
+        mobileMenuOverlay.addEventListener('click', function () {
+            mobileMenu.classList.add('hidden');
+        });
+    }
+
+    // Close mobile menu when clicking nav links
+    const mobileNavLinks = mobileMenu?.querySelectorAll('a');
+    if (mobileNavLinks) {
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                mobileMenu.classList.add('hidden');
+            });
         });
     }
 
