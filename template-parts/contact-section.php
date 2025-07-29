@@ -9,8 +9,9 @@
     <div class="container mx-auto text-center px-4">
         <h2 class="text-4xl font-bold mb-4">Still have questions?</h2>
         <p class="text-xl mb-4">Speak with an instructor today!</p>
-        <p class="text-sm mb-8">8567 Fort Smallwood Rd unit C,
+        <p class="text-sm">8567 Fort Smallwood Rd unit C,
        <br/> Pasadena, MD 21122, United States</p>
+       <p class="text-sm mb-8"><a href="tel:4437027891">Phone: (443) 702-7891</a></p>
         <div class="max-w-xl mx-auto">
             <?php 
             // Contact Form 7 Shortcode
