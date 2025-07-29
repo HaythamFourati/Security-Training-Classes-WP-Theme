@@ -42,7 +42,7 @@
               <i class="fas fa-bullseye mr-3 text-navy"></i>
               <span>Firearms Certifications MD & Multi State</span>
             </a>
-            <a href="/special-police-training" class="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-safety-orange transition-colors border-l-4 border-transparent hover:border-safety-orange flex items-center">
+            <a href="/special-police-training-2" class="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-safety-orange transition-colors border-l-4 border-transparent hover:border-safety-orange flex items-center">
               <i class="fas fa-shield-alt mr-3 text-navy"></i>
               <span>Special Police Training</span>
             </a>
@@ -65,10 +65,33 @@
       <a href="#faq" class="hover:text-safety-orange transition-colors">FAQs</a>
       <a href="<?php echo get_permalink(get_option('page_for_posts')); ?>" class="hover:text-safety-orange transition-colors">Blog</a>
       <a href="#contact" class="hover:text-safety-orange transition-colors">Contact Us</a>
-      <a href="https://www.policeprotectionservicesllc.com/" target="_blank" class="hover:text-safety-orange transition-colors flex items-center">
-        Police Protection Services
-        <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-      </a>
+      
+      <!-- Other Services Dropdown -->
+      <div class="relative group">
+        <button class="hover:text-safety-orange transition-colors flex items-center cursor-pointer">
+          Other Services
+          <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+        <div class="absolute left-0 pt-2 w-80 rounded-md shadow-xl bg-white hidden group-hover:block z-50 transform origin-top-left transition-all duration-150 ease-out">
+          <div class="py-2 text-navy rounded-t-md overflow-hidden">
+            <a href="https://www.policeprotectionservicesllc.com/" target="_blank" class="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-safety-orange transition-colors border-l-4 border-transparent hover:border-safety-orange flex items-center">
+              <i class="fas fa-shield-alt mr-3 text-navy"></i>
+              <span>Police Protection Services</span>
+              <svg class="w-3 h-3 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+            </a>
+            <a href="https://www.policeprotectionservicesllc.com/cannabis-security-in-maryland/" class="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-safety-orange transition-colors border-l-4 border-transparent hover:border-safety-orange flex items-center">
+              <i class="fas fa-truck mr-3 text-navy"></i>
+              <span>Cannabis Transport</span>
+              <svg class="w-3 h-3 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+            </a>
+            <a href="https://marylandgunstorage.com/" class="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-safety-orange transition-colors border-l-4 border-transparent hover:border-safety-orange flex items-center">
+              <i class="fas fa-vault mr-3 text-navy"></i>
+              <span>MD Gun Storage</span>
+              <svg class="w-3 h-3 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+            </a>
+          </div>
+        </div>
+      </div>
     </nav>
 
     <!-- Right-side buttons -->
@@ -123,7 +146,7 @@
                 <i class="fas fa-th-list mr-3 text-safety-orange w-4"></i>
                 <span>ALL CLASSES</span>
               </a>
-              <a href="/security-guard-training" class="hover:text-safety-orange transition-colors py-2 flex items-center">
+              <a href="/security-guard-training-2" class="hover:text-safety-orange transition-colors py-2 flex items-center">
                 <i class="fas fa-user-shield mr-3 text-safety-orange w-4"></i>
                 <span>Security Guard Training</span>
               </a>
@@ -150,10 +173,28 @@
           </div>
         </div>
 
-        <a href="https://www.policeprotectionservicesllc.com/" target="_blank" class="hover:text-safety-orange transition-colors py-3 border-b border-steel-gray border-opacity-30 flex items-center">
-          Police Protection Services
-          <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-        </a>
+        <!-- Mobile Other Services Sub-menu -->
+        <div class="border-b border-steel-gray border-opacity-30">
+          <button id="mobile-services-toggle" class="w-full flex justify-between items-center font-bold text-white py-3">
+            <span>Other Services</span>
+            <svg class="w-4 h-4 transition-transform transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </button>
+          <div id="mobile-services-submenu" class="hidden flex flex-col pl-4 pb-2 border-l-2 border-safety-orange ml-2">
+              <a href="https://www.policeprotectionservicesllc.com/" target="_blank" class="hover:text-safety-orange transition-colors py-2 flex items-center">
+                <i class="fas fa-shield-alt mr-3 text-safety-orange w-4"></i>
+                <span>Police Protection Services</span>
+                <svg class="w-3 h-3 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+              </a>
+              <a href="https://www.policeprotectionservicesllc.com/cannabis-security-in-maryland/" class="hover:text-safety-orange transition-colors py-2 flex items-center">
+                <i class="fas fa-truck mr-3 text-safety-orange w-4"></i>
+                <span>Cannabis Transport</span>
+              </a>
+              <a href="https://marylandgunstorage.com/" class="hover:text-safety-orange transition-colors py-2 flex items-center">
+                <i class="fas fa-vault mr-3 text-safety-orange w-4"></i>
+                <span>MD Gun Storage</span>
+              </a>
+          </div>
+        </div>
         <a href="#faq" class="hover:text-safety-orange transition-colors py-3 border-b border-steel-gray border-opacity-30">FAQs</a>
         <a href="<?php echo get_permalink(get_option('page_for_posts')); ?>" class="hover:text-safety-orange transition-colors py-3 border-b border-steel-gray border-opacity-30">Blog</a>
         <a href="#contact" class="hover:text-safety-orange transition-colors py-3 border-b border-steel-gray border-opacity-30">Contact Us</a>

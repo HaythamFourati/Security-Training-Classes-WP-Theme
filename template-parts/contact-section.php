@@ -23,7 +23,7 @@
             
             if (function_exists('wpcf7_contact_form')) {
                 // Replace '1' with your actual Contact Form 7 ID
-                echo do_shortcode('[contact-form-7 id="edeaf24" title="STA Contact"]');
+                echo do_shortcode('[contact-form-7 id="7bbcb76" title="NEW THEME CONTACT FORM"]');
             } else {
                 // Fallback form if Contact Form 7 is not installed
                 ?>

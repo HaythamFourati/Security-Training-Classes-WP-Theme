@@ -71,6 +71,18 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Mobile Services Sub-menu Toggle
+    const mobileServicesToggle = document.getElementById('mobile-services-toggle');
+    const mobileServicesSubmenu = document.getElementById('mobile-services-submenu');
+
+    if (mobileServicesToggle && mobileServicesSubmenu) {
+        mobileServicesToggle.addEventListener('click', function() {
+            mobileServicesSubmenu.classList.toggle('hidden');
+            const icon = mobileServicesToggle.querySelector('svg');
+            icon.classList.toggle('rotate-180');
+        });
+    }
+
     // FAQ Accordion
     const accordion = document.getElementById('faq-accordion');
     if (accordion) {
