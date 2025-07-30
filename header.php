@@ -34,7 +34,7 @@
               <i class="fas fa-th-list mr-3 text-navy"></i>
               <span>ALL CLASSES</span>
             </a>
-            <a href="/security-guard-training" class="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-safety-orange transition-colors border-l-4 border-transparent hover:border-safety-orange flex items-center">
+            <a href="/security-guard-training-2" class="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-safety-orange transition-colors border-l-4 border-transparent hover:border-safety-orange flex items-center">
               <i class="fas fa-user-shield mr-3 text-navy"></i>
               <span>Security Guard Training</span>
             </a>
@@ -176,7 +176,7 @@
         <!-- Mobile Other Services Sub-menu -->
         <div class="border-b border-steel-gray border-opacity-30">
           <button id="mobile-services-toggle" class="w-full flex justify-between items-center font-bold text-white py-3">
-            <span>Other Services</span>
+            <span>Premium Services</span>
             <svg class="w-4 h-4 transition-transform transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
           </button>
           <div id="mobile-services-submenu" class="hidden flex flex-col pl-4 pb-2 border-l-2 border-safety-orange ml-2">

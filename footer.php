@@ -10,7 +10,7 @@
             <div>
                 <h5 class="text-xl mb-4">Quick Links</h5>
                 <ul class="space-y-3">
-                    <li><a href="/security-guard-training" class="hover:text-safety-orange transition-colors">Security Guard Training</a></li>
+                    <li><a href="/security-guard-training-2" class="hover:text-safety-orange transition-colors">Security Guard Training</a></li>
                     <li><a href="/firearms-certifications" class="hover:text-safety-orange transition-colors">Firearms Certifications</a></li>
                     <li><a href="/special-police-training" class="hover:text-safety-orange transition-colors">Special Police Training</a></li>
                     <li><a href="/nra-classes" class="hover:text-safety-orange transition-colors">NRA Classes</a></li>
