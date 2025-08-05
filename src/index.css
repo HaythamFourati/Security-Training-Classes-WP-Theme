@@ -282,3 +282,37 @@
 .wpcf7-spinner {
   margin-left: 10px;
 }
+
+/* Calendar Container Styles */
+.calendar-container {
+  border-radius: 0.5rem;
+  background: white;
+}
+
+.calendar-container iframe {
+  border-radius: 0.5rem;
+}
+
+/* Hide any potential calendar branding or links */
+.calendar-container::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: linear-gradient(transparent, white);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Responsive calendar adjustments */
+@media (max-width: 768px) {
+  .calendar-container {
+    height: 500px !important;
+  }
+  
+  .calendar-container iframe {
+    height: 550px !important;
+  }
+}
