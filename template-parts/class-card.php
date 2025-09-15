@@ -12,7 +12,9 @@ $class_data = $args['class_data'];
 // Extract and sanitize data
 $eventId = esc_attr($class_data['eventId']);
 $title = esc_html($class_data['title']);
-$short_description = wp_trim_words(wp_strip_all_tags($class_data['description']), 20, '...');
+// Create different description lengths for mobile vs desktop
+$mobile_description = wp_trim_words(wp_strip_all_tags($class_data['description']), 8, '...');
+$desktop_description = wp_trim_words(wp_strip_all_tags($class_data['description']), 20, '...');
 $full_description = wp_kses_post($class_data['description']); // Keep basic HTML for the modal
 $thumbnail_url = esc_url($class_data['thumbnail']);
 $date = esc_html($class_data['date']);
@@ -37,8 +39,9 @@ if (empty($thumbnail_url)) {
     <div class="p-6 flex-grow flex flex-col">
         <h3 class="text-xl font-bold text-navy mb-3 flex-grow"><?php echo $title; ?></h3>
         <p class="text-steel-gray mb-4 text-sm">
-            <?php echo $short_description; ?>
-            <?php if (strlen(wp_strip_all_tags($class_data['description'])) > strlen($short_description)) : ?>
+            <span class="md:hidden"><?php echo $mobile_description; ?></span>
+            <span class="hidden md:inline"><?php echo $desktop_description; ?></span>
+            <?php if (strlen(wp_strip_all_tags($class_data['description'])) > strlen($mobile_description)) : ?>
                 <button data-modal-target="#<?php echo $modal_id; ?>" class="text-safety-orange font-semibold hover:underline text-sm cursor-pointer">Read More</button>
             <?php endif; ?>
         </p>

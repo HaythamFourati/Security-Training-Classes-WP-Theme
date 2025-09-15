@@ -184,6 +184,7 @@
         <img src="https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/9Ys3MLT8cAMGAsVD72yV/media/680e9ec0eb94a846d4062e8f.jpeg" alt="USCCA Training Counselor Logo" class="h-25 w-auto">
         <img src="https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/9Ys3MLT8cAMGAsVD72yV/media/680e9ec03176b980955f2a1a.png" alt="Veteran-Owned Small Business Enterprise Program Logo" class="h-25 w-auto">
       </div>
+      <div class="mb-6 mt-6"> <?php echo do_shortcode('[trustindex no-registration=google]'); ?> </div>
     </div>
   </section>
 

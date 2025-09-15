@@ -19,10 +19,13 @@
       </a>
     </div>
 
+
     <!-- Desktop Navigation Menu -->
     <nav class="hidden md:flex space-x-6 items-center">
       <a href="<?php echo get_home_url(); ?>" class="hover:text-safety-orange transition-colors">Home</a>
       <!-- Classes Dropdown -->
+
+    <!-- Deactivated 
       <div class="relative group">
         <button class="hover:text-safety-orange transition-colors flex items-center cursor-pointer">
           Classes
@@ -61,7 +64,7 @@
           </div>
         </div>
       </div>
-      
+       -->
       <a href="#faq" class="hover:text-safety-orange transition-colors">FAQs</a>
       <a href="<?php echo get_permalink(get_option('page_for_posts')); ?>" class="hover:text-safety-orange transition-colors">Blog</a>
       <a href="#contact" class="hover:text-safety-orange transition-colors">Contact Us</a>
@@ -135,7 +138,9 @@
       <nav class="flex flex-col p-4 max-h-screen overflow-y-auto">
         <a href="<?php echo get_home_url(); ?>" class="hover:text-safety-orange transition-colors py-3 border-b border-steel-gray border-opacity-30">Home</a>
         
+        
         <!-- Mobile Classes Sub-menu -->
+        <!-- Deactivated
         <div class="border-b border-steel-gray border-opacity-30">
           <button id="mobile-classes-toggle" class="w-full flex justify-between items-center font-bold text-white py-3">
             <span>Classes</span>
@@ -172,6 +177,7 @@
               </a>
           </div>
         </div>
+        -->
 
         <!-- Mobile Other Services Sub-menu -->
         <div class="border-b border-steel-gray border-opacity-30">
