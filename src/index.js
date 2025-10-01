@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (filterContainer && classGrid) {
         const allItems = Array.from(classGrid.querySelectorAll('.class-item'));
         let currentPage = 1;
-        const itemsPerPage = 6;
+        const itemsPerPage = 12;
         let currentFilter = 'all';
 
         function updateClasses() {
