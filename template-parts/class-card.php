@@ -17,11 +17,11 @@ $mobile_description = wp_trim_words(wp_strip_all_tags($class_data['description']
 $desktop_description = wp_trim_words(wp_strip_all_tags($class_data['description']), 20, '...');
 $full_description = wp_kses_post($class_data['description']); // Keep basic HTML for the modal
 $thumbnail_url = esc_url($class_data['thumbnail']);
-$date = esc_html($class_data['date']);
-$start_time = esc_html($class_data['start_time']);
 $seats = esc_html($class_data['seats']);
 $booking_url = esc_url($class_data['booking_url']);
 $category = esc_attr($class_data['category']);
+$upcoming_dates = isset($class_data['upcoming_dates']) ? $class_data['upcoming_dates'] : array();
+$meeting_location = isset($class_data['meeting_location']) ? esc_html($class_data['meeting_location']) : '';
 $modal_id = 'class-modal-' . $eventId;
 
 // Default thumbnail if none is provided
@@ -47,14 +47,29 @@ if (empty($thumbnail_url)) {
         </p>
         
         <div class="space-y-3 text-sm text-steel-gray border-t border-gray-200 pt-4 mt-auto">
-            <div class="flex items-center">
-                <svg class="w-4 h-4 mr-2 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                <span><?php echo $date; ?></span>
+            <!-- Upcoming Dates Section -->
+            <?php if (!empty($upcoming_dates)) : ?>
+            <div>
+                <div class="flex items-start mb-2">
+                    <svg class="w-4 h-4 mr-2 mt-0.5 text-navy flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <div class="flex-1">
+                        <span class="font-semibold text-navy">Upcoming Dates:</span>
+                        <ul class="mt-1 space-y-1">
+                            <?php foreach ($upcoming_dates as $date_info) : ?>
+                            <li class="text-xs">
+                                <span class="font-medium"><?php echo esc_html($date_info['date']); ?></span>
+                                <?php if (!empty($date_info['time_slots'])) : ?>
+                                    <span class="text-steel-gray"> – <?php echo esc_html(implode(', ', $date_info['time_slots'])); ?></span>
+                                <?php endif; ?>
+                            </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                </div>
             </div>
-            <div class="flex items-center">
-                <svg class="w-4 h-4 mr-2 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <span><?php echo $start_time; ?></span>
-            </div>
+            <?php endif; ?>
+            
+            <!-- Seats Available -->
             <div class="flex items-center">
                 <svg class="w-4 h-4 mr-2 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                 <span><?php echo $seats; ?> Seats Available</span>

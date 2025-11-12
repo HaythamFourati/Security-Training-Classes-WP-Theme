@@ -42,68 +42,97 @@ function reading_time() {
 }
 
 /**
- * Bookeo API Settings Page
+ * Go High Level API Settings Page
  */
 
 // 1. Add the menu page
-function bookeo_api_settings_menu() {
+function ghl_api_settings_menu() {
     add_options_page(
-        'Bookeo API Settings',
-        'Bookeo API',
+        'Go High Level API Settings',
+        'GHL API',
         'manage_options',
-        'bookeo-api-settings',
-        'bookeo_api_settings_page_html'
+        'ghl-api-settings',
+        'ghl_api_settings_page_html'
     );
 }
-add_action('admin_menu', 'bookeo_api_settings_menu');
+add_action('admin_menu', 'ghl_api_settings_menu');
 
 // 2. Register settings and fields
-function bookeo_api_settings_init() {
-    register_setting('bookeo_api', 'bookeo_api_key');
-    register_setting('bookeo_api', 'bookeo_secret_key');
+function ghl_api_settings_init() {
+    register_setting('ghl_api', 'ghl_base_url');
+    register_setting('ghl_api', 'ghl_bearer_token');
+    register_setting('ghl_api', 'ghl_location_id');
+    register_setting('ghl_api', 'ghl_api_version');
 
     add_settings_section(
-        'bookeo_api_section',
-        'API Credentials',
-        'bookeo_api_section_callback',
-        'bookeo_api'
+        'ghl_api_section',
+        'API Configuration',
+        'ghl_api_section_callback',
+        'ghl_api'
     );
 
     add_settings_field(
-        'bookeo_api_key_field',
-        'API Key',
-        'bookeo_api_key_field_html',
-        'bookeo_api',
-        'bookeo_api_section'
+        'ghl_base_url_field',
+        'Base GET URL',
+        'ghl_base_url_field_html',
+        'ghl_api',
+        'ghl_api_section'
     );
 
     add_settings_field(
-        'bookeo_secret_key_field',
-        'Secret Key',
-        'bookeo_secret_key_field_html',
-        'bookeo_api',
-        'bookeo_api_section'
+        'ghl_bearer_token_field',
+        'Bearer Token',
+        'ghl_bearer_token_field_html',
+        'ghl_api',
+        'ghl_api_section'
+    );
+
+    add_settings_field(
+        'ghl_location_id_field',
+        'Location ID',
+        'ghl_location_id_field_html',
+        'ghl_api',
+        'ghl_api_section'
+    );
+
+    add_settings_field(
+        'ghl_api_version_field',
+        'API Version',
+        'ghl_api_version_field_html',
+        'ghl_api',
+        'ghl_api_section'
     );
 }
-add_action('admin_init', 'bookeo_api_settings_init');
+add_action('admin_init', 'ghl_api_settings_init');
 
 // 3. Callbacks to render the HTML
-function bookeo_api_section_callback() {
-    echo '<p>Enter your Bookeo API credentials below.</p>';
+function ghl_api_section_callback() {
+    echo '<p>Enter your Go High Level API configuration below.</p>';
 }
 
-function bookeo_api_key_field_html() {
-    $api_key = get_option('bookeo_api_key');
-    printf('<input type="text" id="bookeo_api_key" name="bookeo_api_key" value="%s" class="regular-text" />', esc_attr($api_key));
+function ghl_base_url_field_html() {
+    $base_url = get_option('ghl_base_url', 'https://services.leadconnectorhq.com');
+    printf('<input type="url" id="ghl_base_url" name="ghl_base_url" value="%s" class="regular-text" placeholder="https://services.leadconnectorhq.com" />', esc_attr($base_url));
 }
 
-function bookeo_secret_key_field_html() {
-    $secret_key = get_option('bookeo_secret_key');
-    printf('<input type="password" id="bookeo_secret_key" name="bookeo_secret_key" value="%s" class="regular-text" />', esc_attr($secret_key));
+function ghl_bearer_token_field_html() {
+    $bearer_token = get_option('ghl_bearer_token', 'pit-103947b1-b439-4fa1-aebe-8f466f64a2b0');
+    printf('<input type="password" id="ghl_bearer_token" name="ghl_bearer_token" value="%s" class="regular-text" placeholder="pit-103947b1-b439-4fa1-aebe-8f466f64a2b0" />', esc_attr($bearer_token));
+    echo '<p class="description">Enter your Bearer Token (without "Bearer " prefix)</p>';
+}
+
+function ghl_location_id_field_html() {
+    $location_id = get_option('ghl_location_id', '9Ys3MLT8cAMGAsVD72yV');
+    printf('<input type="text" id="ghl_location_id" name="ghl_location_id" value="%s" class="regular-text" placeholder="9Ys3MLT8cAMGAsVD72yV" />', esc_attr($location_id));
+}
+
+function ghl_api_version_field_html() {
+    $api_version = get_option('ghl_api_version', '2021-04-15');
+    printf('<input type="text" id="ghl_api_version" name="ghl_api_version" value="%s" class="regular-text" placeholder="2021-04-15" />', esc_attr($api_version));
 }
 
 // 4. The main settings page HTML
-function bookeo_api_settings_page_html() {
+function ghl_api_settings_page_html() {
     if (!current_user_can('manage_options')) {
         return;
     }
@@ -112,11 +141,21 @@ function bookeo_api_settings_page_html() {
         <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
         <form action="options.php" method="post">
             <?php
-            settings_fields('bookeo_api');
-            do_settings_sections('bookeo_api');
+            settings_fields('ghl_api');
+            do_settings_sections('ghl_api');
             submit_button('Save Settings');
             ?>
         </form>
+        
+        <div style="margin-top: 20px; padding: 15px; background: #f1f1f1; border-left: 4px solid #0073aa;">
+            <h3>API Configuration Reference:</h3>
+            <ul>
+                <li><strong>Base GET URL:</strong> https://services.leadconnectorhq.com</li>
+                <li><strong>Bearer Token:</strong> pit-103947b1-b439-4fa1-aebe-8f466f64a2b0</li>
+                <li><strong>Location ID:</strong> 9Ys3MLT8cAMGAsVD72yV</li>
+                <li><strong>API Version:</strong> 2021-04-15</li>
+            </ul>
+        </div>
     </div>
     <?php
 }
