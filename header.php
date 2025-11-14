@@ -106,7 +106,7 @@
             </svg>
             <span class="text-white text-lg"><?php echo esc_html($GLOBALS['phone_number']); ?></span>
         </a>
-        <a href="https://bookeo.com/securitytrainingacademy" target="_blank" class="bg-safety-orange text-white font-bold py-2 px-4 rounded hover:bg-opacity-90 transition-colors">
+        <a href="<?php echo esc_url(home_url('/all-classes')); ?>" class="bg-safety-orange text-white font-bold py-2 px-4 rounded hover:bg-opacity-90 transition-colors">
             Book Now
         </a>
     </div>
@@ -207,7 +207,7 @@
         
         <!-- Call to Action Buttons -->
         <div class="mt-6 space-y-3">
-          <a href="https://bookeo.com/securitytrainingacademy" target="_blank" class="block bg-safety-orange text-white font-bold py-3 px-4 rounded hover:bg-opacity-90 transition-colors text-center">
+          <a href="<?php echo esc_url(home_url('/all-classes')); ?>" class="block bg-safety-orange text-white font-bold py-3 px-4 rounded hover:bg-opacity-90 transition-colors text-center">
             Book Now
           </a>
           <a href="tel:<?php echo esc_attr($GLOBALS['phone_number']); ?>" class="block text-center py-2 text-white border border-white rounded hover:bg-white hover:text-navy transition-colors">
