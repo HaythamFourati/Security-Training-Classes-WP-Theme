@@ -28,14 +28,12 @@
   </section>
 
 
-<!-- Calendar Section -->
+<!-- Calendar Section - All Classes from GHL -->
 <section class="py-20 bg-gray-50">
-    <div class="container mx-auto px-4 max-w-6xl">
+    <div class="container mx-auto px-4 max-w-7xl">
       <h2 class="text-4xl font-bold text-navy mb-12 text-center">Check Our Schedule</h2>
       <div class="bg-white p-4 md:p-8 rounded-lg shadow-lg">
-        <div class="calendar-container" style="height: 600px; overflow: hidden; position: relative;">
-          <iframe src="https://calendar.google.com/calendar/embed?src=u7iu9m3l3a7aa2dqf3r1tu13fi4pk5fo%40import.calendar.google.com&amp;ctz=America%2FNew_York&amp;showTitle=0&amp;showPrint=0&amp;showTabs=0&amp;showCalendars=0&amp;showTz=0" style="border: 0; position: absolute; top: 0; left: 0;" width="100%" height="650" frameborder="0" scrolling="no"></iframe>
-        </div>
+        <?php get_template_part('template-parts/ghl-calendar'); ?>
       </div>
     </div>
   </section>

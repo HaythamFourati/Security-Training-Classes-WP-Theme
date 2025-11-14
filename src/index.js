@@ -121,10 +121,13 @@ document.addEventListener('DOMContentLoaded', function () {
         let currentFilter = 'all';
 
         function updateClasses() {
-            // 1. Filter items
-            const filteredItems = allItems.filter(item => 
-                currentFilter === 'all' || item.dataset.category === currentFilter
-            );
+            // 1. Filter items (check if category contains the filter keyword)
+            const filteredItems = allItems.filter(item => {
+                if (currentFilter === 'all') return true;
+                // Check if the category string contains the filter keyword
+                const categories = item.dataset.category || '';
+                return categories.split(' ').includes(currentFilter);
+            });
 
             // 2. Hide all items initially
             allItems.forEach(item => item.style.display = 'none');

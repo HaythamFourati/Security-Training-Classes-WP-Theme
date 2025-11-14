@@ -10,9 +10,10 @@
   <p class="text-center text-xl text-orange-200 mb-6">Please select a category from the filters below to view our upcoming classes.</p>
   <div class="flex justify-center flex-wrap gap-2 mb-12" id="class-filters">
     <button class="px-6 py-2 rounded font-semibold bg-navy text-white cursor-pointer" data-filter="all">All</button>
-    <button class="px-6 py-2 rounded font-semibold bg-orange-50 text-navy border border-gray-300 cursor-pointer" data-filter="guard">Security Guard Training</button>
-    <button class="px-6 py-2 rounded font-semibold bg-orange-50 text-navy border border-gray-300 cursor-pointer" data-filter="firearms">Firearms Certification</button>
     <button class="px-6 py-2 rounded font-semibold bg-orange-50 text-navy border border-gray-300 cursor-pointer" data-filter="spo">Special Police Officer (SPO) Training</button>
+    <button class="px-6 py-2 rounded font-semibold bg-orange-50 text-navy border border-gray-300 cursor-pointer" data-filter="firearms">Firearms Certification</button>
+    <button class="px-6 py-2 rounded font-semibold bg-orange-50 text-navy border border-gray-300 cursor-pointer" data-filter="wear-carry">Wear and Carry</button>
+    <button class="px-6 py-2 rounded font-semibold bg-orange-50 text-navy border border-gray-300 cursor-pointer" data-filter="guard">Security Guard Training</button>
   </div>
   <?php
   $base_url = get_option('ghl_base_url');
@@ -115,6 +116,18 @@
     }
 
     if (!empty($available_classes)) {
+          // ============================================
+          // CATEGORY CONFIGURATION - Easy to Edit
+          // ============================================
+          // Add or remove keywords for each category here
+          $category_keywords = array(
+            'spo' => array('spo', 'special police'),
+            'firearms' => array('hql', 'certification', 'permit'),
+            'wear-carry' => array('wear', 'carry'),
+            'guard' => array('guard', 'security officer')
+          );
+          // ============================================
+          
           echo '<div id="class-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4">';
 
           foreach ($available_classes as $class) {
@@ -122,10 +135,25 @@
             $calendar_id = $class['productId'];
             
             $lower_title = strtolower($class['courseSchedule']['title']);
-            $category = 'other';
-            if (strpos($lower_title, 'guard') !== false || strpos($lower_title, 'security officer') !== false) $category = 'guard';
-            elseif (strpos($lower_title, 'firearm') !== false || strpos($lower_title, 'handgun') !== false || strpos($lower_title, 'wear & carry') !== false || strpos($lower_title, 'hql') !== false) $category = 'firearms';
-            elseif (strpos($lower_title, 'spo') !== false || strpos($lower_title, 'special police') !== false) $category = 'spo';
+            $matched_categories = array();
+            
+            // Check each category's keywords
+            foreach ($category_keywords as $category_name => $keywords) {
+              foreach ($keywords as $keyword) {
+                if (strpos($lower_title, $keyword) !== false) {
+                  $matched_categories[] = $category_name;
+                  break; // Found a match for this category, move to next category
+                }
+              }
+            }
+            
+            // If no categories matched, set to 'other'
+            if (empty($matched_categories)) {
+              $matched_categories[] = 'other';
+            }
+            
+            // Remove duplicates and join all categories with space for CSS classes
+            $category = implode(' ', array_unique($matched_categories));
 
             // Clean up HTML description for display
             $description = isset($calendar_info['description']) ? wp_strip_all_tags($calendar_info['description']) : 'Professional training class available for booking.';
