@@ -342,6 +342,52 @@
 
 /* Class Information Section Text */
 .class-modal .text-gray-700,
+.class-modal .prose,
+.class-modal .prose p,
+.class-modal .prose ul,
+.class-modal .prose ol,
+.class-modal .prose li {
+  color: #1f2937 !important; /* Modal styles */
+}
+
+#class-modal .modal-content {
+  color: #1a2a45 !important;
+}
+
+#class-modal .modal-content * {
+  color: #1a2a45 !important;
+}
+
+#class-modal .modal-content h2,
+#class-modal .modal-content h3,
+#class-modal .modal-content h4,
+#class-modal .modal-content p,
+#class-modal .modal-content li,
+#class-modal .modal-content span,
+#class-modal .modal-content div {
+  color: #1a2a45 !important;
+}
+
+#class-modal .modal-content strong,
+#class-modal .modal-content b {
+  color: #0f1a2e !important;
+}
+
+#class-modal .modal-content .text-steel-gray {
+  color: #64748b !important;
+}
+
+/* Filter button hover states */
+#class-filters button:hover {
+  background-color: #ff6600 !important;
+  color: white !important;
+  border-color: #ff6600 !important;
+}
+
+#class-filters button:hover svg {
+  color: white !important;
+}
+
 .class-modal .text-gray-800 {
   color: #374151 !important; /* Darker gray for better readability */
 }

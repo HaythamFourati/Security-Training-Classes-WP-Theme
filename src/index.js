@@ -176,11 +176,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Update active button styles
                 filterContainer.querySelectorAll('button').forEach(button => {
-                    button.classList.remove('bg-navy', 'text-white');
-                    button.classList.add('bg-white', 'text-navy', 'border', 'border-gray-300');
+                    button.classList.remove('bg-safety-orange', 'text-white');
+                    button.classList.add('bg-white', 'text-navy', 'border-4', 'border-navy');
                 });
-                e.target.classList.add('bg-navy', 'text-white');
-                e.target.classList.remove('bg-white', 'text-navy', 'border', 'border-gray-300');
+                e.target.classList.add('bg-safety-orange', 'text-white');
+                e.target.classList.remove('bg-white', 'text-navy', 'border-4', 'border-navy');
 
                 updateClasses();
             }
