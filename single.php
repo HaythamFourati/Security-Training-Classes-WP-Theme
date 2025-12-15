@@ -129,7 +129,7 @@ get_header();
   <section class="pt-6">
     <div class="container mx-auto px-4">
       <div class="max-w-4xl mx-auto text-center">
-        <a href="tel:4437027891" target="_blank" class="block hover:opacity-90 transition-opacity">
+        <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $GLOBALS['phone_number']); ?>" target="_blank" class="block hover:opacity-90 transition-opacity">
           <img src="https://www.securitytrainingclasses.com/wp-content/uploads/2023/03/STA-CTA-1024x289.png" 
                alt="Security Training Academy - Book Your Training Today" 
                class="w-full h-auto rounded-lg">

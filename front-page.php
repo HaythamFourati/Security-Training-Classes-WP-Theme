@@ -58,7 +58,7 @@
               </div>
               <div>
                 <h4 class="font-bold text-lg">Address</h4>
-                <p>8567 Fort Smallwood Rd unit C,<br>Pasadena, MD 21122, United States</p>
+                <p><?php echo esc_html($GLOBALS['address']); ?></p>
               </div>
             </div>
             
@@ -68,7 +68,7 @@
               </div>
               <div>
                 <h4 class="font-bold text-lg">Hours</h4>
-                <p>Monday - Friday: 9:00 AM - 5:00 PM<br>Saturday: 10:00 AM - 3:00 PM<br>Sunday: Closed</p>
+                <p>Monday - Friday: <?php echo esc_html($GLOBALS['working_hours']['monday_friday']); ?><br>Saturday: <?php echo esc_html($GLOBALS['working_hours']['saturday']); ?><br>Sunday: <?php echo esc_html($GLOBALS['working_hours']['sunday']); ?></p>
               </div>
             </div>
             
@@ -78,7 +78,7 @@
               </div>
               <div>
                 <h4 class="font-bold text-lg">Contact</h4>
-                <p>Phone: (410) 255-0000<br>Email: info@securitytrainingclasses.com</p>
+                <p>Phone: <?php echo esc_html($GLOBALS['phone_number']); ?><br>Email: <?php echo esc_html($GLOBALS['email']); ?></p>
               </div>
             </div>
           </div>

@@ -25,9 +25,15 @@ add_action('after_setup_theme', 'boilerplate_add_support');
 
 // Define global variables
 function theme_globals() {
-    global $phone_number, $email;
+    global $phone_number, $email, $address, $working_hours;
     $phone_number = '(443) 702-7891';
     $email = 'info@securitytrainingclasses.com';
+    $address = '8585 Fort Smallwood Rd, Pasadena, MD 21122, United States';
+    $working_hours = array(
+        'monday_friday' => '9 AM–5 PM',
+        'saturday' => '9 AM–4 PM',
+        'sunday' => '9 AM–3 PM'
+    );
 }
 add_action('after_setup_theme', 'theme_globals');
 
