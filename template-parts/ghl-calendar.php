@@ -23,6 +23,7 @@ if (!empty($base_url) && !empty($bearer_token) && !empty($location_id)) {
   $calendars_url = $base_url . "/calendars/?locationId=" . $location_id;
   $calendars_response = wp_remote_get($calendars_url, array('headers' => $headers));
 
+
   if (!is_wp_error($calendars_response)) {
     $calendars_data = json_decode(wp_remote_retrieve_body($calendars_response), true);
     
@@ -30,6 +31,12 @@ if (!empty($base_url) && !empty($bearer_token) && !empty($location_id)) {
     $all_events = array();
     
     if (!empty($calendars_data['calendars'])) {
+      // Define date range for fetching slots (next 30 days - GHL API max is 31 days)
+      $start_date = new DateTime();
+      $end_date = new DateTime('+30 days');
+      $start_timestamp = $start_date->getTimestamp() * 1000; // GHL uses milliseconds
+      $end_timestamp = $end_date->getTimestamp() * 1000;
+      
       // Loop through EVERY calendar
       foreach ($calendars_data['calendars'] as $calendar) {
         // Skip inactive calendars
@@ -37,35 +44,83 @@ if (!empty($base_url) && !empty($bearer_token) && !empty($location_id)) {
           continue;
         }
         
-        // Get all availabilities from this calendar
-        if (!empty($calendar['availabilities'])) {
-          foreach ($calendar['availabilities'] as $availability) {
-            $date_obj = new DateTime($availability['date']);
+        // Skip personal calendars
+        if (stripos($calendar['name'], 'personal calendar') !== false) {
+          continue;
+        }
+        
+        $calendar_id = $calendar['id'];
+        $calendar_name = $calendar['name'];
+        $widget_slug = isset($calendar['widgetSlug']) ? $calendar['widgetSlug'] : '';
+        
+        // Fetch free slots for this calendar
+        $slots_url = $base_url . "/calendars/" . $calendar_id . "/free-slots?startDate=" . $start_timestamp . "&endDate=" . $end_timestamp;
+        $slots_response = wp_remote_get($slots_url, array('headers' => $headers));
+        
+        
+        if (!is_wp_error($slots_response)) {
+          $slots_data = json_decode(wp_remote_retrieve_body($slots_response), true);
+          
+          // Process slots - GHL returns slots grouped by date
+          if (!empty($slots_data) && is_array($slots_data)) {
+            // Handle different response formats
+            $slots_to_process = array();
             
-            // Only show future dates
-            if ($date_obj > new DateTime()) {
-              $time_slots = array();
-              if (!empty($availability['hours'])) {
-                foreach ($availability['hours'] as $hour) {
-                  $open_hour = $hour['openHour'];
-                  $open_minute = $hour['openMinute'];
-                  $time_slots[] = sprintf('%d:%02d %s', 
-                    ($open_hour > 12) ? $open_hour - 12 : ($open_hour == 0 ? 12 : $open_hour),
-                    $open_minute,
-                    ($open_hour >= 12) ? 'PM' : 'AM'
+            // Format 1: Direct array of slots
+            if (isset($slots_data['slots'])) {
+              $slots_to_process = $slots_data['slots'];
+            }
+            // Format 2: Keyed by date
+            elseif (isset($slots_data[date('Y-m-d')]) || !empty(array_filter(array_keys($slots_data), function($k) { return preg_match('/^\d{4}-\d{2}-\d{2}$/', $k); }))) {
+              foreach ($slots_data as $date_key => $day_slots) {
+                if (is_array($day_slots)) {
+                  foreach ($day_slots as $slot) {
+                    $slot['_date'] = $date_key;
+                    $slots_to_process[] = $slot;
+                  }
+                }
+              }
+            }
+            // Format 3: Direct array
+            elseif (isset($slots_data[0])) {
+              $slots_to_process = $slots_data;
+            }
+            
+            foreach ($slots_to_process as $slot) {
+              $slot_time = null;
+              
+              // Try different slot time formats
+              if (isset($slot['startTime'])) {
+                $slot_time = $slot['startTime'];
+              } elseif (isset($slot['start'])) {
+                $slot_time = $slot['start'];
+              } elseif (isset($slot['_date'])) {
+                $slot_time = $slot['_date'];
+              }
+              
+              if ($slot_time) {
+                // Handle timestamp (milliseconds) or ISO date string
+                if (is_numeric($slot_time)) {
+                  $date_obj = new DateTime();
+                  $date_obj->setTimestamp($slot_time / 1000);
+                } else {
+                  $date_obj = new DateTime($slot_time);
+                }
+                
+                // Only show future dates
+                if ($date_obj > new DateTime()) {
+                  $time_formatted = $date_obj->format('g:i A');
+                  
+                  $all_events[] = array(
+                    'date' => $date_obj,
+                    'date_formatted' => $date_obj->format('M j, Y'),
+                    'day_name' => $date_obj->format('l'),
+                    'calendar_name' => $calendar_name,
+                    'time_slots' => array($time_formatted),
+                    'booking_url' => !empty($widget_slug) ? 'https://api.warriormarketinggroup.com/widget/bookings/' . $widget_slug : '#'
                   );
                 }
               }
-              
-              // Add this event to the master list
-              $all_events[] = array(
-                'date' => $date_obj,
-                'date_formatted' => $date_obj->format('M j, Y'),
-                'day_name' => $date_obj->format('l'),
-                'calendar_name' => $calendar['name'],
-                'time_slots' => $time_slots,
-                'booking_url' => 'https://api.warriormarketinggroup.com/widget/bookings/' . $calendar['widgetSlug']
-              );
             }
           }
         }

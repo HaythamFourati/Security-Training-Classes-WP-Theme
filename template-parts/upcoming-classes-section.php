@@ -67,10 +67,15 @@
     if (!is_wp_error($calendars_response)) {
       $calendars_data = json_decode(wp_remote_retrieve_body($calendars_response), true);
       
-      // Debug: Log the actual calendars API response structure
-      error_log('GHL Calendars API Response: ' . print_r($calendars_data, true));
       
       if (!empty($calendars_data['calendars'])) {
+        // Define date range for fetching slots (next 30 days - GHL API max is 31 days)
+        $start_date = new DateTime();
+        $end_date = new DateTime('+30 days');
+        $start_timestamp = $start_date->getTimestamp() * 1000; // GHL uses milliseconds
+        $end_timestamp = $end_date->getTimestamp() * 1000;
+        
+        
         // Process each calendar - ONE CARD PER CALENDAR
         foreach ($calendars_data['calendars'] as $calendar) {
           $calendar_id = $calendar['id'];
@@ -80,37 +85,105 @@
             continue;
           }
           
-          // Skip calendars with no availabilities
-          if (empty($calendar['availabilities'])) {
+          // Skip personal calendars
+          if (stripos($calendar['name'], 'personal calendar') !== false) {
             continue;
           }
           
+          // Fetch free slots for this calendar from GHL API
+          $slots_url = $base_url . "/calendars/" . $calendar_id . "/free-slots?startDate=" . $start_timestamp . "&endDate=" . $end_timestamp;
+          $slots_response = wp_remote_get($slots_url, array('headers' => $headers));
+          
+          
           // Collect all future availability dates for this calendar
           $upcoming_dates = array();
-          foreach ($calendar['availabilities'] as $availability) {
-            $class_date = $availability['date'];
-            $date_obj = new DateTime($class_date);
+          
+          if (!is_wp_error($slots_response)) {
+            $slots_data = json_decode(wp_remote_retrieve_body($slots_response), true);
             
-            // Only include future dates
-            if ($date_obj > new DateTime()) {
-              // Get the time slots
-              $time_slots = array();
-              if (!empty($availability['hours'])) {
-                foreach ($availability['hours'] as $hour) {
-                  $open_hour = $hour['openHour'];
-                  $open_minute = $hour['openMinute'];
-                  $time_slots[] = sprintf('%d:%02d %s', 
-                    ($open_hour > 12) ? $open_hour - 12 : ($open_hour == 0 ? 12 : $open_hour),
-                    $open_minute,
-                    ($open_hour >= 12) ? 'PM' : 'AM'
-                  );
+            // Process slots - handle different GHL response formats
+            if (!empty($slots_data) && is_array($slots_data)) {
+              $slots_to_process = array();
+              
+              // Format 1: {slots: [...]}
+              if (isset($slots_data['slots'])) {
+                $slots_to_process = $slots_data['slots'];
+              }
+              // Format 2: Keyed by date {"2026-01-15": [{...}], ...}
+              elseif (!empty(array_filter(array_keys($slots_data), function($k) { return preg_match('/^\d{4}-\d{2}-\d{2}$/', $k); }))) {
+                foreach ($slots_data as $date_key => $day_slots) {
+                  if (is_array($day_slots)) {
+                    foreach ($day_slots as $slot) {
+                      $slot['_date'] = $date_key;
+                      $slots_to_process[] = $slot;
+                    }
+                  }
+                }
+              }
+              // Format 3: Direct array [{...}, {...}]
+              elseif (isset($slots_data[0])) {
+                $slots_to_process = $slots_data;
+              }
+              
+              // Group slots by date and track max available seats
+              $dates_with_slots = array();
+              $max_seats_available = 0;
+              foreach ($slots_to_process as $slot) {
+                $slot_time = null;
+                
+                // Try different slot time formats
+                if (isset($slot['startTime'])) {
+                  $slot_time = $slot['startTime'];
+                } elseif (isset($slot['start'])) {
+                  $slot_time = $slot['start'];
+                } elseif (isset($slot['_date'])) {
+                  $slot_time = $slot['_date'];
+                }
+                
+                // Track available seats - find the highest from any slot
+                if (isset($slot['availableSlots']) && $slot['availableSlots'] > $max_seats_available) {
+                  $max_seats_available = $slot['availableSlots'];
+                } elseif (isset($slot['available']) && $slot['available'] > $max_seats_available) {
+                  $max_seats_available = $slot['available'];
+                }
+                
+                if ($slot_time) {
+                  // Handle timestamp (milliseconds) or ISO date string
+                  if (is_numeric($slot_time)) {
+                    $date_obj = new DateTime();
+                    $date_obj->setTimestamp($slot_time / 1000);
+                  } else {
+                    $date_obj = new DateTime($slot_time);
+                  }
+                  
+                  // Only include future dates
+                  if ($date_obj > new DateTime()) {
+                    $date_key = $date_obj->format('Y-m-d');
+                    $time_formatted = $date_obj->format('g:i A');
+                    
+                    if (!isset($dates_with_slots[$date_key])) {
+                      $dates_with_slots[$date_key] = array(
+                        'date_obj' => $date_obj,
+                        'time_slots' => array()
+                      );
+                    }
+                    $dates_with_slots[$date_key]['time_slots'][] = $time_formatted;
+                  }
                 }
               }
               
-              $upcoming_dates[] = array(
-                'date' => $date_obj->format('M j, Y'),
-                'time_slots' => $time_slots
-              );
+              // Convert to upcoming_dates format
+              foreach ($dates_with_slots as $date_key => $date_info) {
+                $upcoming_dates[] = array(
+                  'date' => $date_info['date_obj']->format('M j, Y'),
+                  'time_slots' => array_unique($date_info['time_slots'])
+                );
+              }
+              
+              // Sort by date
+              usort($upcoming_dates, function($a, $b) {
+                return strtotime($a['date']) - strtotime($b['date']);
+              });
             }
           }
           
@@ -126,9 +199,9 @@
               'eventId' => $calendar_id,
               'productId' => $calendar_id,
               'courseSchedule' => array('title' => $calendar['name']),
-              'numSeatsAvailable' => isset($calendar['appoinmentPerSlot']) ? $calendar['appoinmentPerSlot'] : 20,
+              'numSeatsAvailable' => $max_seats_available > 0 ? $max_seats_available : (isset($calendar['appoinmentPerSlot']) ? $calendar['appoinmentPerSlot'] : 20),
               'calendar_info' => $calendar,
-              'booking_url' => 'https://api.warriormarketinggroup.com/widget/bookings/' . $calendar['widgetSlug'],
+              'booking_url' => 'https://api.warriormarketinggroup.com/widget/bookings/' . (isset($calendar['widgetSlug']) ? $calendar['widgetSlug'] : ''),
               'upcoming_dates' => $upcoming_dates,
               'meeting_location' => $meeting_location
             );
@@ -184,7 +257,7 @@
               'eventId' => $class['eventId'],
               'title' => $class['courseSchedule']['title'],
               'description' => $description,
-              'thumbnail' => isset($calendar_info['calendarCoverImage']) ? $calendar_info['calendarCoverImage'] : '',
+              'thumbnail' => !empty($calendar_info['calendarCoverImage']) ? $calendar_info['calendarCoverImage'] : get_template_directory_uri() . '/images/default-class-cover.svg',
               'seats' => $class['numSeatsAvailable'],
               'booking_url' => isset($class['booking_url']) ? $class['booking_url'] : "#",
               'category' => $category,
