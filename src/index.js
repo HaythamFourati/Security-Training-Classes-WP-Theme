@@ -9,6 +9,185 @@ if (document.querySelector("#render-react-example-here")) {
   root.render(<ExampleReactComponent />)
 }
 
+// AJAX Loading for GHL Calendar and Classes
+document.addEventListener('DOMContentLoaded', function () {
+    // Load classes via AJAX
+    const classesContainer = document.getElementById('classes-ajax-container');
+    if (classesContainer && typeof ghlAjax !== 'undefined') {
+        fetch(ghlAjax.ajaxUrl + '?action=load_upcoming_classes', {
+            method: 'GET',
+            credentials: 'same-origin'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                classesContainer.innerHTML = data.data.html;
+                // Re-initialize class filtering after AJAX load
+                initClassFiltering();
+            } else {
+                classesContainer.innerHTML = '<p class="text-center text-white">Failed to load classes. Please refresh the page.</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading classes:', error);
+            classesContainer.innerHTML = '<p class="text-center text-white">Failed to load classes. Please refresh the page.</p>';
+        });
+    }
+
+    // Load calendar via AJAX
+    const calendarContainer = document.getElementById('calendar-ajax-container');
+    if (calendarContainer && typeof ghlAjax !== 'undefined') {
+        fetch(ghlAjax.ajaxUrl + '?action=load_ghl_calendar', {
+            method: 'GET',
+            credentials: 'same-origin'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                calendarContainer.innerHTML = data.data.html;
+                // Re-initialize calendar JS after AJAX load
+                initCalendarJS();
+            } else {
+                calendarContainer.innerHTML = '<p class="text-center text-red-500">Failed to load calendar. Please refresh the page.</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading calendar:', error);
+            calendarContainer.innerHTML = '<p class="text-center text-red-500">Failed to load calendar. Please refresh the page.</p>';
+        });
+    }
+});
+
+// Initialize class filtering (called after AJAX load)
+function initClassFiltering() {
+    const filterContainer = document.getElementById('class-filters');
+    const classGrid = document.getElementById('class-grid');
+    const paginationContainer = document.getElementById('class-pagination');
+
+    if (filterContainer && classGrid) {
+        const allItems = Array.from(classGrid.querySelectorAll('.class-item'));
+        let currentPage = 1;
+        const itemsPerPage = 12;
+        let currentFilter = 'all';
+
+        function updateClasses() {
+            const filteredItems = allItems.filter(item => {
+                if (currentFilter === 'all') return true;
+                const categories = item.dataset.category || '';
+                return categories.split(' ').includes(currentFilter);
+            });
+
+            allItems.forEach(item => item.style.display = 'none');
+
+            const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+            if (currentPage > totalPages) currentPage = 1;
+            if (filteredItems.length === 0) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const itemsToShow = filteredItems.slice(startIndex, endIndex);
+
+            itemsToShow.forEach(item => item.style.display = 'flex');
+
+            if (paginationContainer) {
+                paginationContainer.innerHTML = '';
+                if (totalPages > 1) {
+                    const prevButton = document.createElement('button');
+                    prevButton.innerText = 'Previous';
+                    prevButton.disabled = currentPage === 1;
+                    prevButton.className = 'px-4 py-2 rounded font-semibold text-navy border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed';
+                    prevButton.onclick = () => { currentPage--; updateClasses(); };
+                    paginationContainer.appendChild(prevButton);
+
+                    const pageIndicator = document.createElement('span');
+                    pageIndicator.innerText = `Page ${currentPage} of ${totalPages}`;
+                    pageIndicator.className = 'px-4 py-2 text-steel-gray';
+                    paginationContainer.appendChild(pageIndicator);
+
+                    const nextButton = document.createElement('button');
+                    nextButton.innerText = 'Next';
+                    nextButton.disabled = currentPage === totalPages;
+                    nextButton.className = 'px-4 py-2 rounded font-semibold text-navy border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed';
+                    nextButton.onclick = () => { currentPage++; updateClasses(); };
+                    paginationContainer.appendChild(nextButton);
+                }
+            }
+        }
+
+        filterContainer.addEventListener('click', (e) => {
+            const button = e.target.closest('button');
+            if (button && button.dataset.filter) {
+                currentFilter = button.dataset.filter;
+                currentPage = 1;
+
+                filterContainer.querySelectorAll('button').forEach(btn => {
+                    btn.classList.remove('bg-safety-orange', 'text-white');
+                    btn.classList.add('bg-white', 'text-navy', 'border-4', 'border-navy');
+                });
+                button.classList.add('bg-safety-orange', 'text-white');
+                button.classList.remove('bg-white', 'text-navy', 'border-4', 'border-navy');
+
+                updateClasses();
+            }
+        });
+
+        updateClasses();
+    }
+}
+
+// Initialize calendar JS (called after AJAX load)
+function initCalendarJS() {
+    const monthSelector = document.getElementById("month-selector");
+    const prevBtn = document.getElementById("prev-month");
+    const nextBtn = document.getElementById("next-month");
+    const monthContainers = document.querySelectorAll(".month-container");
+
+    if (monthSelector && prevBtn && nextBtn) {
+        function showMonth(monthStr) {
+            monthContainers.forEach(container => {
+                if (container.dataset.month === monthStr) {
+                    container.classList.remove("hidden");
+                } else {
+                    container.classList.add("hidden");
+                }
+            });
+        }
+
+        monthSelector.addEventListener("change", function() {
+            showMonth(this.value);
+        });
+
+        prevBtn.addEventListener("click", function() {
+            const currentIndex = monthSelector.selectedIndex;
+            if (currentIndex > 0) {
+                monthSelector.selectedIndex = currentIndex - 1;
+                monthSelector.dispatchEvent(new Event("change"));
+            }
+        });
+
+        nextBtn.addEventListener("click", function() {
+            const currentIndex = monthSelector.selectedIndex;
+            if (currentIndex < monthSelector.options.length - 1) {
+                monthSelector.selectedIndex = currentIndex + 1;
+                monthSelector.dispatchEvent(new Event("change"));
+            }
+        });
+    }
+
+    // Tooltip functionality
+    document.querySelectorAll(".event-tooltip-trigger").forEach(trigger => {
+        const tooltip = trigger.querySelector(".event-tooltip");
+        if (tooltip) {
+            trigger.addEventListener("mouseenter", function() {
+                tooltip.style.display = "block";
+            });
+            trigger.addEventListener("mouseleave", function() {
+                tooltip.style.display = "none";
+            });
+        }
+    });
+}
+
 // Mobile Menu Toggle
 document.addEventListener('DOMContentLoaded', function () {
     // Floating header behavior
@@ -109,113 +288,30 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Class Filtering, Pagination, and Modal Logic
-    const filterContainer = document.getElementById('class-filters');
-    const classGrid = document.getElementById('class-grid');
-    const paginationContainer = document.getElementById('class-pagination');
-
-    if (filterContainer && classGrid) {
-        const allItems = Array.from(classGrid.querySelectorAll('.class-item'));
-        let currentPage = 1;
-        const itemsPerPage = 12;
-        let currentFilter = 'all';
-
-        function updateClasses() {
-            // 1. Filter items (check if category contains the filter keyword)
-            const filteredItems = allItems.filter(item => {
-                if (currentFilter === 'all') return true;
-                // Check if the category string contains the filter keyword
-                const categories = item.dataset.category || '';
-                return categories.split(' ').includes(currentFilter);
-            });
-
-            // 2. Hide all items initially
-            allItems.forEach(item => item.style.display = 'none');
-
-            // 3. Calculate pagination for filtered items
-            const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-            if (currentPage > totalPages) currentPage = 1;
-            if (filteredItems.length === 0) currentPage = 1;
-
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const itemsToShow = filteredItems.slice(startIndex, endIndex);
-
-            // 4. Show only the items for the current page
-            itemsToShow.forEach(item => item.style.display = 'flex');
-
-            // 5. Render pagination controls
-            paginationContainer.innerHTML = '';
-            if (totalPages > 1) {
-                const prevButton = document.createElement('button');
-                prevButton.innerText = 'Previous';
-                prevButton.disabled = currentPage === 1;
-                prevButton.className = 'px-4 py-2 rounded font-semibold text-navy border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed';
-                prevButton.onclick = () => { currentPage--; updateClasses(); };
-                paginationContainer.appendChild(prevButton);
-
-                const pageIndicator = document.createElement('span');
-                pageIndicator.innerText = `Page ${currentPage} of ${totalPages}`;
-                pageIndicator.className = 'px-4 py-2 text-steel-gray';
-                paginationContainer.appendChild(pageIndicator);
-
-                const nextButton = document.createElement('button');
-                nextButton.innerText = 'Next';
-                nextButton.disabled = currentPage === totalPages;
-                nextButton.className = 'px-4 py-2 rounded font-semibold text-navy border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed';
-                nextButton.onclick = () => { currentPage++; updateClasses(); };
-                paginationContainer.appendChild(nextButton);
+    // Modal handling with event delegation (works for AJAX-loaded content)
+    document.body.addEventListener('click', function(e) {
+        const openButton = e.target.closest('[data-modal-target]');
+        if (openButton) {
+            const modal = document.querySelector(openButton.dataset.modalTarget);
+            if (modal) {
+                modal.classList.replace('hidden', 'flex');
+                document.body.classList.add('overflow-hidden');
             }
         }
 
-        // Event listener for filter buttons
-        filterContainer.addEventListener('click', (e) => {
-            if (e.target.tagName === 'BUTTON') {
-                currentFilter = e.target.dataset.filter;
-                currentPage = 1;
-
-                // Update active button styles
-                filterContainer.querySelectorAll('button').forEach(button => {
-                    button.classList.remove('bg-safety-orange', 'text-white');
-                    button.classList.add('bg-white', 'text-navy', 'border-4', 'border-navy');
-                });
-                e.target.classList.add('bg-safety-orange', 'text-white');
-                e.target.classList.remove('bg-white', 'text-navy', 'border-4', 'border-navy');
-
-                updateClasses();
-            }
-        });
-
-
-
-        // Modal handling with event delegation
-        document.body.addEventListener('click', function(e) {
-            const openButton = e.target.closest('[data-modal-target]');
-            if (openButton) {
-                const modal = document.querySelector(openButton.dataset.modalTarget);
-                if (modal) {
-                    modal.classList.replace('hidden', 'flex');
-                    document.body.classList.add('overflow-hidden');
-                }
-            }
-
-            const closeButton = e.target.closest('[data-modal-close]');
-            if (closeButton) {
-                const modal = document.querySelector(closeButton.dataset.modalClose);
-                if (modal) {
-                    modal.classList.replace('flex', 'hidden');
-                    document.body.classList.remove('overflow-hidden');
-                }
-            }
-
-            // Also close modal if clicking on the overlay
-            if (e.target.classList.contains('class-modal')) {
-                e.target.classList.replace('flex', 'hidden');
+        const closeButton = e.target.closest('[data-modal-close]');
+        if (closeButton) {
+            const modal = document.querySelector(closeButton.dataset.modalClose);
+            if (modal) {
+                modal.classList.replace('flex', 'hidden');
                 document.body.classList.remove('overflow-hidden');
             }
-        });
+        }
 
-        // Initial load
-        updateClasses();
-    }
+        // Also close modal if clicking on the overlay
+        if (e.target.classList.contains('class-modal')) {
+            e.target.classList.replace('flex', 'hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+    });
 });

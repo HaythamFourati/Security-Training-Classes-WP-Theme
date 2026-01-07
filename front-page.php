@@ -23,17 +23,60 @@
         </div>
       </div>
 
-      <?php get_template_part('template-parts/upcoming-classes-section'); ?>
+      <!-- Upcoming Classes Section - Loads via AJAX for faster page render -->
+      <div id="upcoming-classes" class="text-navy pb-8 md:p-12">
+        <h2 class="text-4xl text-white mb-6 text-center font-instrument-serif">Our Upcoming Classes</h2>
+        
+        <!-- Filter Section -->
+        <div class="mb-8">
+          <div class="text-center mb-4">
+            <p class="text-2xl font-bold text-white mb-2">👇 SELECT A CATEGORY BELOW 👇</p>
+            <p class="text-lg text-orange-200">Click on any button to filter classes by type</p>
+          </div>
+          <div class="flex justify-center flex-wrap gap-3" id="class-filters">
+            <button class="px-8 py-4 rounded-lg font-bold text-lg bg-safety-orange text-white cursor-pointer shadow-lg hover:shadow-xl hover:brightness-110 transform hover:scale-105 transition-all flex items-center gap-2" data-filter="all">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
+              All Classes
+            </button>
+            <button class="px-8 py-4 rounded-lg font-bold text-lg bg-white text-navy border-4 border-navy cursor-pointer shadow-lg hover:shadow-xl hover:bg-safety-orange hover:text-white hover:border-safety-orange transform hover:scale-105 transition-all flex items-center gap-2" data-filter="spo">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg>
+              SPO Training
+            </button>
+            <button class="px-8 py-4 rounded-lg font-bold text-lg bg-white text-navy border-4 border-navy cursor-pointer shadow-lg hover:shadow-xl hover:bg-safety-orange hover:text-white hover:border-safety-orange transform hover:scale-105 transition-all flex items-center gap-2" data-filter="firearms">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
+              Firearms Certification
+            </button>
+            <button class="px-8 py-4 rounded-lg font-bold text-lg bg-white text-navy border-4 border-navy cursor-pointer shadow-lg hover:shadow-xl hover:bg-safety-orange hover:text-white hover:border-safety-orange transform hover:scale-105 transition-all flex items-center gap-2" data-filter="guard">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>
+              Security Guard
+            </button>
+          </div>
+        </div>
+        
+        <!-- Classes content loads here via AJAX -->
+        <div id="classes-ajax-container">
+          <div class="flex justify-center items-center py-20">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-white"></div>
+            <span class="ml-4 text-white text-xl">Loading classes...</span>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
 
-<!-- Calendar Section - All Classes from GHL -->
+<!-- Calendar Section - Loads via AJAX for faster page render -->
 <section class="py-20 bg-gray-50">
     <div class="container mx-auto px-4 max-w-7xl">
       <h2 class="text-4xl font-bold text-navy mb-12 text-center">Check Our Schedule</h2>
       <div class="bg-white p-4 md:p-8 rounded-lg shadow-lg">
-        <?php get_template_part('template-parts/ghl-calendar'); ?>
+        <!-- Calendar content loads here via AJAX -->
+        <div id="calendar-ajax-container">
+          <div class="flex justify-center items-center py-20">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-navy"></div>
+            <span class="ml-4 text-navy text-xl">Loading calendar...</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
