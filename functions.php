@@ -449,23 +449,23 @@ function ghl_api_section_callback() {
 }
 
 function ghl_base_url_field_html() {
-    $base_url = get_option('ghl_base_url', 'https://services.leadconnectorhq.com');
+    $base_url = get_option('ghl_base_url', '');
     printf('<input type="url" id="ghl_base_url" name="ghl_base_url" value="%s" class="regular-text" placeholder="https://services.leadconnectorhq.com" />', esc_attr($base_url));
 }
 
 function ghl_bearer_token_field_html() {
-    $bearer_token = get_option('ghl_bearer_token', 'pit-103947b1-b439-4fa1-aebe-8f466f64a2b0');
-    printf('<input type="password" id="ghl_bearer_token" name="ghl_bearer_token" value="%s" class="regular-text" placeholder="pit-103947b1-b439-4fa1-aebe-8f466f64a2b0" />', esc_attr($bearer_token));
+    $bearer_token = get_option('ghl_bearer_token', '');
+    printf('<input type="password" id="ghl_bearer_token" name="ghl_bearer_token" value="%s" class="regular-text" />', esc_attr($bearer_token));
     echo '<p class="description">Enter your Bearer Token (without "Bearer " prefix)</p>';
 }
 
 function ghl_location_id_field_html() {
-    $location_id = get_option('ghl_location_id', '9Ys3MLT8cAMGAsVD72yV');
-    printf('<input type="text" id="ghl_location_id" name="ghl_location_id" value="%s" class="regular-text" placeholder="9Ys3MLT8cAMGAsVD72yV" />', esc_attr($location_id));
+    $location_id = get_option('ghl_location_id', '');
+    printf('<input type="text" id="ghl_location_id" name="ghl_location_id" value="%s" class="regular-text" />', esc_attr($location_id));
 }
 
 function ghl_api_version_field_html() {
-    $api_version = get_option('ghl_api_version', '2021-04-15');
+    $api_version = get_option('ghl_api_version', '');
     printf('<input type="text" id="ghl_api_version" name="ghl_api_version" value="%s" class="regular-text" placeholder="2021-04-15" />', esc_attr($api_version));
 }
 
