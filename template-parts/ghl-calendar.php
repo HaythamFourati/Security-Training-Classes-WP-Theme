@@ -64,15 +64,27 @@ if (!empty($base_url) && !empty($bearer_token) && !empty($location_id)) {
         if (!empty($slots_data) && is_array($slots_data)) {
           $slots_to_process = array();
           
-          // Handle different response formats
+          // Handle different response formats from GHL free-slots API
+          // Actual format: {"2026-01-10": {"slots": ["2026-01-10T08:30:00-05:00"]}, ...}
           if (isset($slots_data['slots'])) {
             $slots_to_process = $slots_data['slots'];
           } elseif (!empty(array_filter(array_keys($slots_data), function($k) { return preg_match('/^\d{4}-\d{2}-\d{2}$/', $k); }))) {
-            foreach ($slots_data as $date_key => $day_slots) {
-              if (is_array($day_slots)) {
+            // Format: {"2026-01-10": {"slots": ["2026-01-10T08:30:00-05:00"]}}
+            foreach ($slots_data as $date_key => $day_data) {
+              if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_key)) continue; // Skip non-date keys like traceId
+              
+              if (is_array($day_data)) {
+                $day_slots = isset($day_data['slots']) ? $day_data['slots'] : $day_data;
                 foreach ($day_slots as $slot) {
-                  $slot['_date'] = $date_key;
-                  $slots_to_process[] = $slot;
+                  if (is_string($slot)) {
+                    // Slot is an ISO datetime string like "2026-01-10T08:30:00-05:00"
+                    $slots_to_process[] = array('datetime' => $slot);
+                  } elseif (is_array($slot)) {
+                    $slot['_date'] = $date_key;
+                    $slots_to_process[] = $slot;
+                  } elseif (is_numeric($slot)) {
+                    $slots_to_process[] = array('datetime' => $slot);
+                  }
                 }
               }
             }
@@ -83,7 +95,10 @@ if (!empty($base_url) && !empty($bearer_token) && !empty($location_id)) {
           foreach ($slots_to_process as $slot) {
             $slot_time = null;
             
-            if (isset($slot['startTime'])) {
+            // Check for full datetime string (most common GHL format)
+            if (isset($slot['datetime'])) {
+              $slot_time = $slot['datetime'];
+            } elseif (isset($slot['startTime'])) {
               $slot_time = $slot['startTime'];
             } elseif (isset($slot['start'])) {
               $slot_time = $slot['start'];
@@ -96,12 +111,12 @@ if (!empty($base_url) && !empty($bearer_token) && !empty($location_id)) {
                 $date_obj = new DateTime();
                 $date_obj->setTimestamp($slot_time / 1000);
               } else {
+                // ISO datetime string like "2026-01-10T08:30:00-05:00"
                 $date_obj = new DateTime($slot_time);
               }
+              $time_formatted = $date_obj->format('g:i A');
               
               if ($date_obj > new DateTime()) {
-                $time_formatted = $date_obj->format('g:i A');
-                
                 $all_events[] = array(
                   'date' => $date_obj,
                   'date_formatted' => $date_obj->format('M j, Y'),
