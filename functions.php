@@ -200,23 +200,21 @@ function get_ghl_calendars_with_slots_cached() {
       });
     }
     
-    if (!empty($upcoming_dates)) {
-      $meeting_location = '';
-      if (!empty($calendar['teamMembers'][0]['meetingLocation'])) {
-        $meeting_location = $calendar['teamMembers'][0]['meetingLocation'];
-      }
-      
-      $available_classes[] = array(
-        'eventId' => $calendar_id,
-        'productId' => $calendar_id,
-        'courseSchedule' => array('title' => $calendar['name']),
-        'numSeatsAvailable' => $max_seats_available > 0 ? $max_seats_available : (isset($calendar['appoinmentPerSlot']) ? $calendar['appoinmentPerSlot'] : 20),
-        'calendar_info' => $calendar,
-        'booking_url' => 'https://api.warriormarketinggroup.com/widget/bookings/' . (isset($calendar['widgetSlug']) ? $calendar['widgetSlug'] : ''),
-        'upcoming_dates' => $upcoming_dates,
-        'meeting_location' => $meeting_location
-      );
+    $meeting_location = '';
+    if (!empty($calendar['teamMembers'][0]['meetingLocation'])) {
+      $meeting_location = $calendar['teamMembers'][0]['meetingLocation'];
     }
+    
+    $available_classes[] = array(
+      'eventId' => $calendar_id,
+      'productId' => $calendar_id,
+      'courseSchedule' => array('title' => $calendar['name']),
+      'numSeatsAvailable' => $max_seats_available > 0 ? $max_seats_available : (isset($calendar['appoinmentPerSlot']) ? $calendar['appoinmentPerSlot'] : 20),
+      'calendar_info' => $calendar,
+      'booking_url' => 'https://api.warriormarketinggroup.com/widget/bookings/' . (isset($calendar['widgetSlug']) ? $calendar['widgetSlug'] : ''),
+      'upcoming_dates' => $upcoming_dates,
+      'meeting_location' => $meeting_location
+    );
   }
   
   // Cache for 5 minutes

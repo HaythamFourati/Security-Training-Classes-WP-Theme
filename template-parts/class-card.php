@@ -64,6 +64,7 @@ if (empty($thumbnail_url)) {
                             </li>
                             <?php endforeach; ?>
                         </ul>
+                        <p class="text-xs text-safety-orange font-semibold mt-2">Click on Book Now for all dates</p>
                     </div>
                 </div>
             </div>
