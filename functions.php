@@ -72,11 +72,22 @@ function get_ghl_calendars_with_slots_cached() {
     return false;
   }
   
-  // Define date range (30 days - GHL API max is 31)
-  $start_date = new DateTime();
-  $end_date = new DateTime('+30 days');
-  $start_timestamp = $start_date->getTimestamp() * 1000;
-  $end_timestamp = $end_date->getTimestamp() * 1000;
+  // Define 3 date ranges to cover 90 days (GHL API max is 31 days per request)
+  $now = new DateTime();
+  $date_ranges = array(
+    array(
+      'start' => $now->getTimestamp() * 1000,
+      'end' => (new DateTime('+30 days'))->getTimestamp() * 1000
+    ),
+    array(
+      'start' => (new DateTime('+31 days'))->getTimestamp() * 1000,
+      'end' => (new DateTime('+60 days'))->getTimestamp() * 1000
+    ),
+    array(
+      'start' => (new DateTime('+61 days'))->getTimestamp() * 1000,
+      'end' => (new DateTime('+90 days'))->getTimestamp() * 1000
+    )
+  );
   
   // STEP 2: Filter calendars and collect IDs for parallel requests
   $calendars_to_fetch = array();
@@ -96,8 +107,9 @@ function get_ghl_calendars_with_slots_cached() {
     return array();
   }
   
-  // STEP 3: Fetch all slots in PARALLEL using curl_multi
-  $slots_responses = ghl_fetch_slots_parallel($calendars_to_fetch, $base_url, $bearer_token, $api_version, $start_timestamp, $end_timestamp);
+  // STEP 3: Fetch all slots for all calendars across all 3 date ranges in PARALLEL
+  // This makes all calendar×range API calls simultaneously for optimal performance
+  $slots_responses = ghl_fetch_slots_parallel_multi_range($calendars_to_fetch, $base_url, $bearer_token, $api_version, $date_ranges);
   
   // STEP 4: Process the responses
   $available_classes = array();
@@ -200,21 +212,24 @@ function get_ghl_calendars_with_slots_cached() {
       });
     }
     
-    $meeting_location = '';
-    if (!empty($calendar['teamMembers'][0]['meetingLocation'])) {
-      $meeting_location = $calendar['teamMembers'][0]['meetingLocation'];
+    // Only include classes that have upcoming dates in the 90-day window
+    if (!empty($upcoming_dates)) {
+      $meeting_location = '';
+      if (!empty($calendar['teamMembers'][0]['meetingLocation'])) {
+        $meeting_location = $calendar['teamMembers'][0]['meetingLocation'];
+      }
+      
+      $available_classes[] = array(
+        'eventId' => $calendar_id,
+        'productId' => $calendar_id,
+        'courseSchedule' => array('title' => $calendar['name']),
+        'numSeatsAvailable' => $max_seats_available > 0 ? $max_seats_available : (isset($calendar['appoinmentPerSlot']) ? $calendar['appoinmentPerSlot'] : 20),
+        'calendar_info' => $calendar,
+        'booking_url' => 'https://api.warriormarketinggroup.com/widget/bookings/' . (isset($calendar['widgetSlug']) ? $calendar['widgetSlug'] : ''),
+        'upcoming_dates' => $upcoming_dates,
+        'meeting_location' => $meeting_location
+      );
     }
-    
-    $available_classes[] = array(
-      'eventId' => $calendar_id,
-      'productId' => $calendar_id,
-      'courseSchedule' => array('title' => $calendar['name']),
-      'numSeatsAvailable' => $max_seats_available > 0 ? $max_seats_available : (isset($calendar['appoinmentPerSlot']) ? $calendar['appoinmentPerSlot'] : 20),
-      'calendar_info' => $calendar,
-      'booking_url' => 'https://api.warriormarketinggroup.com/widget/bookings/' . (isset($calendar['widgetSlug']) ? $calendar['widgetSlug'] : ''),
-      'upcoming_dates' => $upcoming_dates,
-      'meeting_location' => $meeting_location
-    );
   }
   
   // Cache for 5 minutes
@@ -224,8 +239,107 @@ function get_ghl_calendars_with_slots_cached() {
 }
 
 /**
+ * Fetch slots for multiple calendars across multiple date ranges in PARALLEL
+ * This fetches all calendar×range combinations simultaneously for maximum performance
+ * 
+ * @param array $calendars Array of calendars keyed by calendar_id
+ * @param string $base_url GHL API base URL
+ * @param string $bearer_token API bearer token
+ * @param string $api_version API version
+ * @param array $date_ranges Array of date ranges, each with 'start' and 'end' timestamps
+ * @return array Results keyed by calendar_id with merged slot data from all ranges
+ */
+function ghl_fetch_slots_parallel_multi_range($calendars, $base_url, $bearer_token, $api_version, $date_ranges) {
+  $multi_handle = curl_multi_init();
+  $curl_handles = array();
+  $results = array();
+  
+  // Create a curl handle for each calendar × date range combination
+  foreach ($calendars as $calendar_id => $calendar) {
+    foreach ($date_ranges as $range_index => $range) {
+      $url = $base_url . "/calendars/" . $calendar_id . "/free-slots?startDate=" . $range['start'] . "&endDate=" . $range['end'];
+      
+      $ch = curl_init();
+      curl_setopt_array($ch, array(
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => array(
+          'Authorization: Bearer ' . $bearer_token,
+          'Version: ' . $api_version,
+          'Content-Type: application/json'
+        ),
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_SSL_VERIFYPEER => true
+      ));
+      
+      curl_multi_add_handle($multi_handle, $ch);
+      // Store handle with unique key: calendar_id + range_index
+      $curl_handles[$calendar_id . '_' . $range_index] = array(
+        'handle' => $ch,
+        'calendar_id' => $calendar_id,
+        'range_index' => $range_index
+      );
+    }
+  }
+  
+  // Execute all requests in parallel
+  $running = null;
+  do {
+    curl_multi_exec($multi_handle, $running);
+    curl_multi_select($multi_handle);
+  } while ($running > 0);
+  
+  // Collect and merge results by calendar_id
+  foreach ($curl_handles as $handle_data) {
+    $ch = $handle_data['handle'];
+    $calendar_id = $handle_data['calendar_id'];
+    
+    $response = curl_multi_getcontent($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    
+    if ($http_code === 200 && $response) {
+      $range_data = json_decode($response, true);
+      
+      // Initialize calendar result if not exists
+      if (!isset($results[$calendar_id])) {
+        $results[$calendar_id] = array();
+      }
+      
+      // Merge slot data from this range into calendar results
+      if (!empty($range_data) && is_array($range_data)) {
+        foreach ($range_data as $key => $value) {
+          // Skip metadata keys like traceId
+          if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $key)) {
+            // This is a date key with slots
+            if (!isset($results[$calendar_id][$key])) {
+              $results[$calendar_id][$key] = $value;
+            } else {
+              // Merge slots if date already exists from another range
+              if (isset($value['slots']) && isset($results[$calendar_id][$key]['slots'])) {
+                $results[$calendar_id][$key]['slots'] = array_merge(
+                  $results[$calendar_id][$key]['slots'],
+                  $value['slots']
+                );
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    curl_multi_remove_handle($multi_handle, $ch);
+    curl_close($ch);
+  }
+  
+  curl_multi_close($multi_handle);
+  
+  return $results;
+}
+
+/**
  * Fetch slots for multiple calendars in PARALLEL using curl_multi
  * This dramatically reduces API fetch time from N*latency to ~1*latency
+ * DEPRECATED: Use ghl_fetch_slots_parallel_multi_range() for better performance with multiple date ranges
  */
 function ghl_fetch_slots_parallel($calendars, $base_url, $bearer_token, $api_version, $start_timestamp, $end_timestamp) {
   $multi_handle = curl_multi_init();
