@@ -431,6 +431,23 @@ function get_ghl_calendars_all_cached() {
     );
   }
   
+  // Sort classes: those with upcoming dates first, then those without dates
+  usort($available_classes, function($a, $b) {
+    $a_has_dates = !empty($a['upcoming_dates']);
+    $b_has_dates = !empty($b['upcoming_dates']);
+    
+    // If one has dates and the other doesn't, prioritize the one with dates
+    if ($a_has_dates && !$b_has_dates) {
+      return -1;
+    }
+    if (!$a_has_dates && $b_has_dates) {
+      return 1;
+    }
+    
+    // Otherwise maintain original order
+    return 0;
+  });
+  
   // Cache for 5 minutes
   set_transient($cache_key, $available_classes, 5 * MINUTE_IN_SECONDS);
   
