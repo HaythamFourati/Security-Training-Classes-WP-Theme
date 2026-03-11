@@ -10,8 +10,8 @@
 <section id="all-classes" class="py-20 bg-white">
   <div class="container mx-auto px-4">
     <?php
-    // Use cached API data for better performance
-    $available_classes = get_ghl_calendars_with_slots_cached();
+    // Use cached API data for better performance - includes ALL classes regardless of dates
+    $available_classes = get_ghl_calendars_all_cached();
     
     if ($available_classes === false) {
       echo '<p class="text-center text-red-500">API configuration is incomplete or unavailable. Please check Settings -> GHL API.</p>';

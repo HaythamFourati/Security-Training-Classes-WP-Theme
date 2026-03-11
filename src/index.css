@@ -49,6 +49,12 @@
   .hover\:text-navy:hover {
     color: var(--color-navy);
   }
+  .hover\:bg-navy:hover {
+    background-color: var(--color-navy);
+  }
+  .hover\:text-white:hover {
+    color: #ffffff;
+  }
 
   .modal-overlay-bg {
     background-color: rgba(0, 0, 0, 0.6);

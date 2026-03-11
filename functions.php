@@ -239,6 +239,205 @@ function get_ghl_calendars_with_slots_cached() {
 }
 
 /**
+ * Get all GHL calendars with slots - includes ALL active calendars regardless of upcoming dates
+ * Used for "All Classes" page to show complete catalog
+ */
+function get_ghl_calendars_all_cached() {
+  $cache_key = 'ghl_calendars_all';
+  $cached_data = get_transient($cache_key);
+  
+  // Return cached data if available
+  if ($cached_data !== false) {
+    return $cached_data;
+  }
+  
+  // Get API credentials
+  $base_url = get_option('ghl_base_url');
+  $bearer_token = get_option('ghl_bearer_token');
+  $location_id = get_option('ghl_location_id');
+  $api_version = get_option('ghl_api_version');
+  
+  if (empty($base_url) || empty($bearer_token) || empty($location_id) || empty($api_version)) {
+    return false;
+  }
+  
+  $headers = array(
+    'Authorization' => 'Bearer ' . $bearer_token,
+    'Version' => $api_version,
+    'Content-Type' => 'application/json'
+  );
+  
+  // STEP 1: Fetch all calendars first (single request)
+  $calendars_url = $base_url . "/calendars/?locationId=" . $location_id;
+  $calendars_response = wp_remote_get($calendars_url, array('headers' => $headers));
+  
+  if (is_wp_error($calendars_response)) {
+    return false;
+  }
+  
+  $calendars_data = json_decode(wp_remote_retrieve_body($calendars_response), true);
+  
+  if (empty($calendars_data['calendars'])) {
+    return false;
+  }
+  
+  // Define 3 date ranges to cover 90 days (GHL API max is 31 days per request)
+  $now = new DateTime();
+  $date_ranges = array(
+    array(
+      'start' => $now->getTimestamp() * 1000,
+      'end' => (new DateTime('+30 days'))->getTimestamp() * 1000
+    ),
+    array(
+      'start' => (new DateTime('+31 days'))->getTimestamp() * 1000,
+      'end' => (new DateTime('+60 days'))->getTimestamp() * 1000
+    ),
+    array(
+      'start' => (new DateTime('+61 days'))->getTimestamp() * 1000,
+      'end' => (new DateTime('+90 days'))->getTimestamp() * 1000
+    )
+  );
+  
+  // STEP 2: Filter calendars and collect IDs for parallel requests
+  $calendars_to_fetch = array();
+  foreach ($calendars_data['calendars'] as $calendar) {
+    // Skip inactive calendars
+    if (!isset($calendar['isActive']) || $calendar['isActive'] !== true) {
+      continue;
+    }
+    // Skip personal calendars
+    if (stripos($calendar['name'], 'personal calendar') !== false) {
+      continue;
+    }
+    $calendars_to_fetch[$calendar['id']] = $calendar;
+  }
+  
+  if (empty($calendars_to_fetch)) {
+    return array();
+  }
+  
+  // STEP 3: Fetch all slots for all calendars across all 3 date ranges in PARALLEL
+  $slots_responses = ghl_fetch_slots_parallel_multi_range($calendars_to_fetch, $base_url, $bearer_token, $api_version, $date_ranges);
+  
+  // STEP 4: Process the responses
+  $available_classes = array();
+  
+  foreach ($calendars_to_fetch as $calendar_id => $calendar) {
+    $slots_data = isset($slots_responses[$calendar_id]) ? $slots_responses[$calendar_id] : null;
+    
+    $upcoming_dates = array();
+    $max_seats_available = 0;
+    
+    if (!empty($slots_data) && is_array($slots_data)) {
+      $slots_to_process = array();
+      
+      // Handle different response formats from GHL free-slots API
+      if (isset($slots_data['slots'])) {
+        $slots_to_process = $slots_data['slots'];
+      } elseif (!empty(array_filter(array_keys($slots_data), function($k) { return preg_match('/^\d{4}-\d{2}-\d{2}$/', $k); }))) {
+        foreach ($slots_data as $date_key => $day_data) {
+          if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_key)) continue;
+          
+          if (is_array($day_data)) {
+            $day_slots = isset($day_data['slots']) ? $day_data['slots'] : $day_data;
+            foreach ($day_slots as $slot) {
+              if (is_string($slot)) {
+                $slots_to_process[] = array('datetime' => $slot);
+              } elseif (is_array($slot)) {
+                $slot['_date'] = $date_key;
+                $slots_to_process[] = $slot;
+              } elseif (is_numeric($slot)) {
+                $slots_to_process[] = array('datetime' => $slot);
+              }
+            }
+          }
+        }
+      } elseif (isset($slots_data[0])) {
+        $slots_to_process = $slots_data;
+      }
+      
+      $dates_with_slots = array();
+      
+      foreach ($slots_to_process as $slot) {
+        $slot_time = null;
+        
+        if (isset($slot['datetime'])) {
+          $slot_time = $slot['datetime'];
+        } elseif (isset($slot['startTime'])) {
+          $slot_time = $slot['startTime'];
+        } elseif (isset($slot['start'])) {
+          $slot_time = $slot['start'];
+        } elseif (isset($slot['_date'])) {
+          $slot_time = $slot['_date'];
+        }
+        
+        // Track max seats
+        if (isset($slot['availableSlots']) && $slot['availableSlots'] > $max_seats_available) {
+          $max_seats_available = $slot['availableSlots'];
+        } elseif (isset($slot['available']) && $slot['available'] > $max_seats_available) {
+          $max_seats_available = $slot['available'];
+        }
+        
+        if ($slot_time) {
+          if (is_numeric($slot_time)) {
+            $date_obj = new DateTime();
+            $date_obj->setTimestamp($slot_time / 1000);
+          } else {
+            $date_obj = new DateTime($slot_time);
+          }
+          
+          if ($date_obj > new DateTime()) {
+            $date_key = $date_obj->format('Y-m-d');
+            $time_formatted = $date_obj->format('g:i A');
+            
+            if (!isset($dates_with_slots[$date_key])) {
+              $dates_with_slots[$date_key] = array(
+                'date_obj' => $date_obj,
+                'time_slots' => array()
+              );
+            }
+            $dates_with_slots[$date_key]['time_slots'][] = $time_formatted;
+          }
+        }
+      }
+      
+      foreach ($dates_with_slots as $date_key => $date_info) {
+        $upcoming_dates[] = array(
+          'date' => $date_info['date_obj']->format('M j, Y'),
+          'time_slots' => array_unique($date_info['time_slots'])
+        );
+      }
+      
+      usort($upcoming_dates, function($a, $b) {
+        return strtotime($a['date']) - strtotime($b['date']);
+      });
+    }
+    
+    // Include ALL calendars regardless of upcoming dates (key difference from get_ghl_calendars_with_slots_cached)
+    $meeting_location = '';
+    if (!empty($calendar['teamMembers'][0]['meetingLocation'])) {
+      $meeting_location = $calendar['teamMembers'][0]['meetingLocation'];
+    }
+    
+    $available_classes[] = array(
+      'eventId' => $calendar_id,
+      'productId' => $calendar_id,
+      'courseSchedule' => array('title' => $calendar['name']),
+      'numSeatsAvailable' => $max_seats_available > 0 ? $max_seats_available : (isset($calendar['appoinmentPerSlot']) ? $calendar['appoinmentPerSlot'] : 20),
+      'calendar_info' => $calendar,
+      'booking_url' => 'https://api.warriormarketinggroup.com/widget/bookings/' . (isset($calendar['widgetSlug']) ? $calendar['widgetSlug'] : ''),
+      'upcoming_dates' => $upcoming_dates,
+      'meeting_location' => $meeting_location
+    );
+  }
+  
+  // Cache for 5 minutes
+  set_transient($cache_key, $available_classes, 5 * MINUTE_IN_SECONDS);
+  
+  return $available_classes;
+}
+
+/**
  * Fetch slots for multiple calendars across multiple date ranges in PARALLEL
  * This fetches all calendar×range combinations simultaneously for maximum performance
  * 

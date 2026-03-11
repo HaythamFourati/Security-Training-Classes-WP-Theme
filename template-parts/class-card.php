@@ -48,27 +48,29 @@ if (empty($thumbnail_url)) {
         
         <div class="space-y-3 text-sm text-steel-gray border-t border-gray-200 pt-4 mt-auto">
             <!-- Upcoming Dates Section -->
-            <?php if (!empty($upcoming_dates)) : ?>
             <div>
                 <div class="flex items-start mb-2">
                     <svg class="w-4 h-4 mr-2 mt-0.5 text-navy flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     <div class="flex-1">
                         <span class="font-semibold text-navy">Upcoming Dates:</span>
-                        <ul class="mt-1 space-y-1">
-                            <?php foreach ($upcoming_dates as $date_info) : ?>
-                            <li class="text-xs">
-                                <span class="font-medium"><?php echo esc_html($date_info['date']); ?></span>
-                                <?php if (!empty($date_info['time_slots'])) : ?>
-                                    <span class="text-steel-gray"> – <?php echo esc_html(implode(', ', $date_info['time_slots'])); ?></span>
-                                <?php endif; ?>
-                            </li>
-                            <?php endforeach; ?>
-                        </ul>
-                        <p class="text-xs text-safety-orange font-semibold mt-2">Click on Book Now for all dates</p>
+                        <?php if (!empty($upcoming_dates)) : ?>
+                            <ul class="mt-1 space-y-1">
+                                <?php foreach ($upcoming_dates as $date_info) : ?>
+                                <li class="text-xs">
+                                    <span class="font-medium"><?php echo esc_html($date_info['date']); ?></span>
+                                    <?php if (!empty($date_info['time_slots'])) : ?>
+                                        <span class="text-steel-gray"> – <?php echo esc_html(implode(', ', $date_info['time_slots'])); ?></span>
+                                    <?php endif; ?>
+                                </li>
+                                <?php endforeach; ?>
+                            </ul>
+                            <p class="text-xs text-safety-orange font-semibold mt-2">Click on Book Now for all dates</p>
+                        <?php else : ?>
+                            <p class="mt-1 text-xs text-steel-gray italic">No upcoming classes</p>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
-            <?php endif; ?>
             
             <!-- Seats Available -->
             <div class="flex items-center">
@@ -77,7 +79,11 @@ if (empty($thumbnail_url)) {
             </div>
         </div>
 
-        <a href="<?php echo $booking_url; ?>" target="_blank" class="mt-6 bg-safety-orange text-white font-bold py-3 px-6 rounded w-full text-center block hover:bg-opacity-90 transition-colors">Book Now</a>
+        <?php if (!empty($upcoming_dates)) : ?>
+            <a href="<?php echo $booking_url; ?>" target="_blank" class="mt-6 bg-safety-orange text-white font-bold py-3 px-6 rounded w-full text-center block hover:bg-opacity-90 transition-colors">Book Now</a>
+        <?php else : ?>
+            <a href="#contact" class="mt-6 bg-white text-navy font-bold py-3 px-6 rounded w-full text-center block border-2 border-navy hover:bg-navy hover:text-white transition-all">Request this Class</a>
+        <?php endif; ?>
     </div>
 </div>
 
