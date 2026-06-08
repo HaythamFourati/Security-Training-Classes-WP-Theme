@@ -397,3 +397,41 @@
 .class-modal .text-gray-800 {
   color: #374151 !important; /* Darker gray for better readability */
 }
+
+/* Confetti Animation for Booking Confirmation */
+.confetti-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  opacity: 0;
+  animation: confetti-fall 3s ease-out forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100vh) rotate(720deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti {
+    animation: none;
+    display: none;
+  }
+}

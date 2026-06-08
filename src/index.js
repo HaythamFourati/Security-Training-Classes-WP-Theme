@@ -314,4 +314,89 @@ document.addEventListener('DOMContentLoaded', function () {
             document.body.classList.remove('overflow-hidden');
         }
     });
+
+    // Booking Confirmation Page Animation
+    const successIcon = document.getElementById('success-icon');
+    const mainHeading = document.getElementById('main-heading');
+    const subHeading = document.getElementById('sub-heading');
+    const confettiContainer = document.getElementById('confetti-container');
+    
+    if (successIcon && mainHeading && subHeading) {
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        
+        if (!prefersReducedMotion) {
+            successIcon.style.opacity = '0';
+            successIcon.style.transform = 'scale(0.5)';
+            mainHeading.style.opacity = '0';
+            mainHeading.style.transform = 'translateY(20px)';
+            subHeading.style.opacity = '0';
+            subHeading.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                successIcon.style.transition = 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                successIcon.style.opacity = '1';
+                successIcon.style.transform = 'scale(1)';
+            }, 100);
+            
+            setTimeout(() => {
+                mainHeading.style.transition = 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+                mainHeading.style.opacity = '1';
+                mainHeading.style.transform = 'translateY(0)';
+            }, 300);
+            
+            setTimeout(() => {
+                subHeading.style.transition = 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+                subHeading.style.opacity = '1';
+                subHeading.style.transform = 'translateY(0)';
+            }, 500);
+            
+            // Trigger confetti animation
+            if (confettiContainer) {
+                createConfetti(confettiContainer);
+            }
+        }
+    }
 });
+
+// Confetti animation function
+function createConfetti(container) {
+    const colors = ['#ff6600', '#1a2a45', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+    const shapes = ['circle', 'square', 'triangle'];
+    const confettiCount = 80;
+    
+    for (let i = 0; i < confettiCount; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const shape = shapes[Math.floor(Math.random() * shapes.length)];
+        const size = Math.random() * 8 + 6;
+        const left = Math.random() * 100;
+        const delay = Math.random() * 0.5;
+        const duration = Math.random() * 1 + 2.5;
+        
+        confetti.style.left = left + '%';
+        confetti.style.width = size + 'px';
+        confetti.style.height = size + 'px';
+        confetti.style.backgroundColor = color;
+        confetti.style.animationDelay = delay + 's';
+        confetti.style.animationDuration = duration + 's';
+        
+        if (shape === 'circle') {
+            confetti.style.borderRadius = '50%';
+        } else if (shape === 'triangle') {
+            confetti.style.width = '0';
+            confetti.style.height = '0';
+            confetti.style.backgroundColor = 'transparent';
+            confetti.style.borderLeft = size/2 + 'px solid transparent';
+            confetti.style.borderRight = size/2 + 'px solid transparent';
+            confetti.style.borderBottom = size + 'px solid ' + color;
+        }
+        
+        container.appendChild(confetti);
+    }
+    
+    setTimeout(() => {
+        container.innerHTML = '';
+    }, 4000);
+}
